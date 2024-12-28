@@ -1,0 +1,5 @@
+# igonre tout les node_modules
+**/node_modules/ 
+**/.env
+**/build/
+**/power.bat
