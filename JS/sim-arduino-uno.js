@@ -1,34 +1,58 @@
-const uniqueValues = new Set();
+let lastSentData = null;
 
-function fetchSerialData() {
+function getLatestValue() {
   const serialContent = document.querySelector(
     ".code_panel__serial__content__text"
   );
+  if (serialContent) {
+    const lines = serialContent.innerText.trim().split("\n"); // Diviser par lignes
+    const lastValue = lines[lines.length - 1]; // Dernière ligne
+    return lastValue && lastValue.trim() ? lastValue : null; // Si la ligne est vide ou invalide, renvoyer null
+  }
+  return null;
+}
 
-  if (!serialContent) {
-    console.error("Élément du Serial Monitor introuvable");
+function sendDataToServer(value) {
+  const values = value.split(",").map((v) => v.trim());
+  const c = values[0] ? parseFloat(values[0]) : null;
+  const bpm = values[1] ? parseInt(values[1]) : null;
+  const spo2 = values[2] ? parseInt(values[2]) : null;
+
+  if (c === null && bpm === null && spo2 === null) {
     return;
   }
 
-  const lines = serialContent.innerText.split("\n");
-  lines.forEach((line) => {
-    uniqueValues.add(line);
-  });
+  // Comparer la valeur actuelle avec celle envoyée précédemment
+  const currentData = `${c},${bpm},${spo2}`;
+  if (lastSentData === currentData) {
+    return;
+  }
+
+  lastSentData = currentData;
+
+  const data = {
+    c: c,
+    bpm: bpm,
+    spo2: spo2,
+  };
+
+  console.log("Données Envoyées: ", JSON.stringify(data));
+
+  fetch("https://iot-3s.onrender.com/api/simulation/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => response.json())
+    .then((data) => console.log("Succeed!"))
+    .catch((error) => console.error("Erreur:", error));
 }
 
-function saveToFile() {
-  const blob = new Blob([Array.from(uniqueValues).join("\n")], {
-    type: "text/plain",
-  });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "serial_data.txt";
-  link.click();
-}
-
-const interval = setInterval(fetchSerialData, 1000);
-
-setTimeout(() => {
-  clearInterval(interval);
-  saveToFile();
-}, 60000); // Arrêt après 60 secondes
+setInterval(() => {
+  const value = getLatestValue();
+  if (value) {
+    sendDataToServer(value);
+  }
+}, 2000);
