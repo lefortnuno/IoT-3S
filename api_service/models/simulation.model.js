@@ -5,7 +5,7 @@ let Simulation = function (simulation) {
 };
 
 Simulation.add = async (newData) => {
-  try {  
+  try {
     const query = `INSERT INTO simulations ("temperature", "heart_rate", "pression") VALUES ($1, $2, $3)`;
 
     const result = await dbConn.query(query, [
@@ -22,8 +22,9 @@ Simulation.add = async (newData) => {
 Simulation.getAll = async (result) => {
   try {
     const result = await dbConn.query(
-      "SELECT * FROM simulations ORDER BY id DESC "
+      "SELECT * FROM simulations ORDER BY id DESC"
     );
+    console.log(result.rows[0]);
 
     return result.rows;
   } catch (error) {
