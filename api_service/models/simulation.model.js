@@ -6,9 +6,10 @@ let Simulation = function (simulation) {
 
 Simulation.add = async (newData) => {
   try {
-    const query = `INSERT INTO simulations ("temperature", "heart_rate", "pression") VALUES ($1, $2, $3)`;
+    const query = `INSERT INTO simulations ("temperature", "heart_rate", "pression") VALUES ($1, $2, $3, $4)`;
 
     const result = await dbConn.query(query, [
+      newData.u_id,
       newData.temperature,
       newData.heart_rate,
       newData.pression,

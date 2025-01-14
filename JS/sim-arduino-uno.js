@@ -29,8 +29,10 @@ function sendDataToServer(value) {
   }
 
   lastSentData = currentData;
+  const id = Math.floor(Math.random() * 3) + 1;
 
   const data = {
+    u_id: id,
     c: c,
     bpm: bpm,
     spo2: spo2,

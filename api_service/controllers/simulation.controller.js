@@ -5,6 +5,7 @@ module.exports.add = async (req, res) => {
   let data = req.body;
 
   const newData = {
+    u_id: data.u_id,
     temperature: data.c,
     heart_rate: data.bpm,
     pression: data.spo2,
