@@ -54,14 +54,12 @@ module.exports.getAllUsers = async (req, res) => {
 };
 
 module.exports.getUser = async (req, res) => {
-  const id = req.params.id; 
+  const id = req.params.id;
 
   try {
     const result = await Simulation.getUser({ id });
     res.status(200).send(result);
   } catch (error) {
-    console.log(error);
-
     res.status(500).send(error);
   }
 };

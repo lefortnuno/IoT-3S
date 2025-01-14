@@ -111,8 +111,7 @@ Simulation.getStatValue = async (values) => {
         AND created_at >= $2 
         AND created_at < $2::DATE + INTERVAL '1 day'`,
       [values.id, values.date]
-    );
-    console.log(result.rows[0]);
+    ); 
 
     return result.rows;
   } catch (error) {
