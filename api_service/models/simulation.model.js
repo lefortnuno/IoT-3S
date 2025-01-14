@@ -54,22 +54,6 @@ Simulation.add = async (newData) => {
   }
 };
 
-Simulation.getAll = async (values) => {
-  try {
-    const result = await dbConn.query(
-      `SELECT * FROM simulations 
-        WHERE u_id = $1
-        AND created_at >= $2 
-        AND created_at < $2::DATE + INTERVAL '1 day' ORDER BY id DESC`,
-      [values.id, values.date]
-    );
-
-    return result.rows;
-  } catch (error) {
-    throw error;
-  }
-};
-
 Simulation.getAllUsers = async () => {
   try {
     const result = await dbConn.query("SELECT * FROM users ORDER BY u_id DESC");
@@ -86,6 +70,22 @@ Simulation.getUser = async (value) => {
       value.id,
     ]);
 
+    return result.rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+Simulation.getAll = async (values) => {
+  try {
+    const result = await dbConn.query(
+      `SELECT * FROM simulations 
+        WHERE u_id = $1
+        AND created_at >= $2 
+        AND created_at < $2::DATE + INTERVAL '1 day' ORDER BY id DESC`,
+      [values.id, values.date]
+    );
+ 
     return result.rows;
   } catch (error) {
     throw error;
@@ -111,7 +111,7 @@ Simulation.getStatValue = async (values) => {
         AND created_at >= $2 
         AND created_at < $2::DATE + INTERVAL '1 day'`,
       [values.id, values.date]
-    ); 
+    );
 
     return result.rows;
   } catch (error) {

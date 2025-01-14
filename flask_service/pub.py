@@ -90,7 +90,7 @@ def fetch_and_publish(url):
         print(f"Erreur lors de la récupération des données : {e}")
 
 # URL contenant les données JSON
-url = "https://iot-3s.onrender.com/api/simulation/"
+url = "https://iot-3s.onrender.com/api/simulation/vitals/2"
 
 # Lancer la récupération et la publication
 fetch_and_publish(url)

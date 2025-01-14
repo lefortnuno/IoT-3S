@@ -28,22 +28,6 @@ module.exports.add = async (req, res) => {
   }
 };
 
-module.exports.getAll = async (req, res) => {
-  const id = req.params.id;
-  const date = req.body.date;
-
-  if (!id || !date) {
-    return res.status(400).send({ error: "Missing id or date" });
-  }
-
-  try {
-    const result = await Simulation.getAll({ id, date });
-    res.status(200).send(result);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
-
 module.exports.getAllUsers = async (req, res) => {
   try {
     const result = await Simulation.getAllUsers();
@@ -66,7 +50,7 @@ module.exports.getUser = async (req, res) => {
 
 module.exports.getStatValue = async (req, res) => {
   const id = req.params.id;
-  const date = req.body.date;
+  const date = req.query.date;
 
   if (!id || !date) {
     return res.status(400).send({ error: "Missing id or date" });
@@ -74,6 +58,22 @@ module.exports.getStatValue = async (req, res) => {
 
   try {
     const result = await Simulation.getStatValue({ id, date });
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+module.exports.getAll = async (req, res) => {
+  const id = req.params.id;
+  const date = req.query.date;
+
+  if (!id || !date) {
+    return res.status(400).send({ error: "Missing id or date" });
+  }
+
+  try {
+    const result = await Simulation.getAll({ id, date });
     res.status(200).send(result);
   } catch (error) {
     res.status(500).send(error);
