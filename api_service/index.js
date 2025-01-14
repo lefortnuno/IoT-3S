@@ -2,8 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 require("dotenv").config({ path: "./config/.env" });
- 
-const SimulationRoute = require("./routes/simulation.route"); 
+
+const SimulationRoute = require("./routes/simulation.route");
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,8 +24,8 @@ app.use((req, res, next) => {
   }
   next();
 });
- 
-app.use("/api/simulation", SimulationRoute);  
+
+app.use("/api/simulation", SimulationRoute);
 
 app.listen(process.env.PORT || process.env.IP_HOST, () => {
   console.log(`Lancé sur ${process.env.IP_HOST}:${process.env.PORT} .... `);
