@@ -15,8 +15,8 @@ client.connect(broker, port)
  
 id_user = 1
 id_user_tmp = id_user
-# url = "https://iot-3s.onrender.com/api/simulation/" 
-url = "http://192.168.1.10:5111/api/simulation/" 
+url = "https://iot-3s.onrender.com/api/simulation/" 
+# url = "http://192.168.1.10:5111/api/simulation/" 
  
 
 def fetch_and_publish_user(url, api_name, id):
