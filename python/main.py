@@ -14,6 +14,7 @@ client = mqtt.Client()
 client.connect(broker, port)
  
 id_user = 1
+id_user_tmp = id_user
 url = "https://iot-3s.onrender.com/api/simulation/" 
 # url = "http://192.168.1.10:5111/api/simulation/" 
  
@@ -53,16 +54,27 @@ def fetch_and_publish_statistics(url, api_name, id):
         response.raise_for_status()  
         data = response.json()[0] 
          
+        # message = {
+        #     "max_t": round(float(data.get("max_t", 0)), 2),
+        #     "max_h": round(float(data.get("max_h", 0)), 2),
+        #     "max_p": round(float(data.get("max_p", 0)), 2),
+        #     "min_t": round(float(data.get("min_t", 0)), 2),
+        #     "min_h": round(float(data.get("min_h", 0)), 2),
+        #     "min_p": round(float(data.get("min_p", 0)), 2),
+        #     "avg_t": round(float(data.get("avg_t", 0)), 2),
+        #     "avg_h": round(float(data.get("avg_h", 0)), 2),
+        #     "avg_p": round(float(data.get("avg_p", 0)), 2),
+        # }
         message = {
-            "max_t": round(float(data.get("max_t", 0)), 2),
-            "max_h": round(float(data.get("max_h", 0)), 2),
-            "max_p": round(float(data.get("max_p", 0)), 2),
-            "min_t": round(float(data.get("min_t", 0)), 2),
-            "min_h": round(float(data.get("min_h", 0)), 2),
-            "min_p": round(float(data.get("min_p", 0)), 2),
-            "avg_t": round(float(data.get("avg_t", 0)), 2),
-            "avg_h": round(float(data.get("avg_h", 0)), 2),
-            "avg_p": round(float(data.get("avg_p", 0)), 2),
+            "max_t": data.get("max_t"),
+            "max_h": data.get("max_h"),
+            "max_p": data.get("max_p"),
+            "min_t": data.get("min_t"),
+            "min_h": data.get("min_h"),
+            "min_p": data.get("min_p"),
+            "avg_t": data.get("avg_t"),
+            "avg_h": data.get("avg_h"),
+            "avg_p": data.get("avg_p"),
         }
 
         anomalies = []
@@ -119,11 +131,11 @@ def fetch_and_publish(url, api_name, id):
  
  
 while True:
-    if id_user == 1:
+    if id_user != 0:
         fetch_and_publish_user(url, "user/", id_user)
         fetch_and_publish_statistics(url, "stat/", id_user) 
         id_user = 0
 
-    fetch_and_publish(url, "vitals/", id_user)
+    fetch_and_publish(url, "vitals/", id_user_tmp) 
     time.sleep(5) 
     

@@ -68,7 +68,7 @@ Simulation.getUser = async (value) => {
   try {
     const result = await dbConn.query("SELECT * FROM users WHERE u_id = $1", [
       value.id,
-    ]);
+    ]); 
 
     return result.rows;
   } catch (error) {
@@ -85,7 +85,12 @@ Simulation.getAll = async (values) => {
         AND created_at < $2::DATE + INTERVAL '1 day' ORDER BY id DESC`,
       [values.id, values.date]
     );
- 
+    // const result = await dbConn.query(
+    //   `SELECT * FROM simulations 
+    //     WHERE u_id = $1 ORDER BY id DESC`,
+    //   [values.id]
+    // ); 
+
     return result.rows;
   } catch (error) {
     throw error;
