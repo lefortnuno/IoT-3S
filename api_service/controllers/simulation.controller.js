@@ -51,6 +51,8 @@ module.exports.getUser = async (req, res) => {
 module.exports.getStatValue = async (req, res) => {
   const id = req.params.id;
   const date = req.query.date;
+  // const date = req.body.date;
+  // console.log(id, date);
 
   if (!id || !date) {
     return res.status(400).send({ error: "Missing id or date" });
