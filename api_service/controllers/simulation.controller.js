@@ -18,7 +18,7 @@ module.exports.add = async (req, res) => {
     temperature: data.c,
     heart_rate: data.bpm,
     pression: data.spo2,
-  };
+  }; 
 
   try {
     const result = await Simulation.add(newData);

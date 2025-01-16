@@ -13,7 +13,7 @@ topicResume = "health/vitals/resumes"
 client = mqtt.Client()
 client.connect(broker, port)
  
-id_user = 1
+id_user = 2
 id_user_tmp = id_user
 url = "https://iot-3s.onrender.com/api/simulation/" 
 # url = "http://192.168.1.10:5111/api/simulation/" 
@@ -65,17 +65,6 @@ def fetch_and_publish_statistics(url, api_name, id):
             "avg_h": round(float(data.get("avg_h", 0)), 2),
             "avg_p": round(float(data.get("avg_p", 0)), 2),
         }
-        # message = {
-        #     "max_t": data.get("max_t"),
-        #     "max_h": data.get("max_h"),
-        #     "max_p": data.get("max_p"),
-        #     "min_t": data.get("min_t"),
-        #     "min_h": data.get("min_h"),
-        #     "min_p": data.get("min_p"),
-        #     "avg_t": data.get("avg_t"),
-        #     "avg_h": data.get("avg_h"),
-        #     "avg_p": data.get("avg_p"),
-        # }
 
         anomalies = []
         if message["avg_t"] and message["avg_t"] > 39.0:
