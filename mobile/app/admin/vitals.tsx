@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { LineChart, BarChart, PieChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import Slider from "@react-native-community/slider";
@@ -116,7 +116,7 @@ export default function Vitals() {
       </View>
 
       <View style={styles.sliderContainer}>
-        <Text>Exercise Intensity: {intensity}%</Text>
+        <Text style={styles.bbold}>Simulation d'Exercice: {intensity}%</Text>
         <Slider
           style={styles.slider}
           minimumValue={0}
@@ -130,81 +130,88 @@ export default function Vitals() {
         />
       </View>
 
-      <BarChart
-        style={styles.chartGraphe}
-        data={{
-          labels: new Array(temperatureData.length).fill(""),
-          datasets: [
-            {
-              data: temperatureData,
-            },
-          ],
-        }}
-        width={screenWidth - 30}
-        height={200}
-        chartConfig={{
-          backgroundColor: "#bcbcbc",
-          backgroundGradientFrom: "#bcbcbc",
-          backgroundGradientTo: "#bcbcbc",
-          decimalPlaces: 1,
-          color: (opacity = 1) => `rgba(255, 119, 0, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-        }}
-      />
+      {/* ScrollView to make charts scrollable */}
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <BarChart
+          style={styles.chartGraphe}
+          data={{
+            labels: new Array(temperatureData.length).fill(""),
+            datasets: [
+              {
+                data: temperatureData,
+              },
+            ],
+          }}
+          width={screenWidth - 30}
+          height={200}
+          chartConfig={{
+            backgroundColor: "#bcbcbc",
+            backgroundGradientFrom: "#bcbcbc",
+            backgroundGradientTo: "#bcbcbc",
+            decimalPlaces: 1,
+            color: (opacity = 1) => `rgba(255, 119, 0, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          }}
+        />
 
-      <LineChart
-        style={styles.chartGraphe}
-        data={{
-          labels: new Array(heartRateData.length).fill(""),
-          datasets: [
-            {
-              data: heartRateData,
-            },
-          ],
-        }}
-        width={screenWidth - 30}
-        height={200}
-        chartConfig={{
-          backgroundColor: "#bcbcbc",
-          backgroundGradientFrom: "#bcbcbc",
-          backgroundGradientTo: "#bcbcbc",
-          decimalPlaces: 2,
-          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
-        }}
-        bezier
-      />
+        <LineChart
+          style={styles.chartGraphe}
+          data={{
+            labels: new Array(heartRateData.length).fill(""),
+            datasets: [
+              {
+                data: heartRateData,
+              },
+            ],
+          }}
+          width={screenWidth - 30}
+          height={200}
+          chartConfig={{
+            backgroundColor: "#bcbcbc",
+            backgroundGradientFrom: "#bcbcbc",
+            backgroundGradientTo: "#bcbcbc",
+            decimalPlaces: 2,
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
+          }}
+          bezier
+        />
 
-      <PieChart
-        data={[
-          {
-            name: "SpO2",
-            population: spo2,
-            color: "rgba(0, 255, 0, 1)",
-            legendFontColor: "#7F7F7F",
-            legendFontSize: 15,
-          },
-          {
-            name: "Rest",
-            population: parseFloat((120 - spo2).toFixed(2)),
-            color: "rgba(192, 192, 192, 1)",
-            legendFontColor: "#7F7F7F",
-            legendFontSize: 15,
-          },
-        ]}
-        width={screenWidth - 40}
-        height={180}
-        chartConfig={{
-          backgroundColor: "#a6a6a6",
-          backgroundGradientFrom: "#a6a6a6",
-          backgroundGradientTo: "#a6a6a6",
-          color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
-        }}
-        accessor={"population"}
-        backgroundColor={"transparent"}
-        paddingLeft={"15"}
-        absolute
-      />
+        <PieChart
+          data={[
+            {
+              name: "SpO2",
+              population: spo2,
+              color: "rgba(0, 255, 0, 1)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 15,
+            },
+            {
+              name: "Rest",
+              population: parseFloat((120 - spo2).toFixed(2)),
+              color: "rgba(192, 192, 192, 1)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 15,
+            },
+          ]}
+          width={screenWidth - 40}
+          height={180}
+          chartConfig={{
+            backgroundColor: "#a6a6a6",
+            backgroundGradientFrom: "#a6a6a6",
+            backgroundGradientTo: "#a6a6a6",
+            color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
+          }}
+          accessor={"population"}
+          backgroundColor={"transparent"}
+          paddingLeft={"15"}
+          absolute
+        />
+      </ScrollView>
     </View>
   );
 }
@@ -253,5 +260,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     color: "#555",
+  },
+  bbold: { 
+    fontWeight: "bold", 
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 20,
   },
 });

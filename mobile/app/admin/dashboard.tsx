@@ -23,18 +23,22 @@ const Dashboard = () => {
   const [users, setUsers] = useState<User[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    const getUsers = async () => {
-      try {
-        const response = await axios.get<User[]>(
-          "http://192.168.1.10:5111/api/simulation/"
-        );
-        setUsers(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  const getUsers = async () => {
+    try {
+      const response = await axios.get<User[]>(
+        "http://192.168.1.10:5111/api/simulation/"
+      );
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  useEffect(() => {
     const interval = setInterval(getUsers, 2500);
 
     return () => clearInterval(interval);
@@ -52,9 +56,9 @@ const Dashboard = () => {
   const navigateToVitals = (user: User) => {
     router.push({
       pathname: "/admin/vitals",
-      params: { user: JSON.stringify(user) },  
+      params: { user: JSON.stringify(user) },
     });
-  };  
+  };
 
   return (
     <View style={styles.container}>
@@ -75,7 +79,7 @@ const Dashboard = () => {
             >
               <Image
                 source={require("../../assets/images/oeil.png")}
-                style={{ width: 24, height: 24 }}
+                style={styles.eyeIcon}
               />
             </TouchableOpacity>
           </View>
@@ -98,41 +102,58 @@ const Dashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f8f9fa", // Légère couleur de fond
+    padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 20,
+    color: "#1E3A8A", // Bleu sombre pour un look professionnel
     textAlign: "center",
+    marginBottom: 20,
   },
   header: {
     flexDirection: "row",
-    backgroundColor: "#ddd",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
+    backgroundColor: "#3498db", // Fond bleu clair pour l'en-tête
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 3, // Ombre pour effet 3D
   },
   headerCell: {
     flex: 1,
-    fontWeight: "bold",
+    color: "#fff",
     textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   row: {
     flexDirection: "row",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    alignItems: "center",
+    backgroundColor: "#ffffff",
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    marginVertical: 8,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4, // Ombre pour effet 3D sur les lignes
   },
   cell: {
     flex: 1,
     textAlign: "center",
+    fontSize: 14,
+    color: "#555",
   },
   eyeButton: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "center",
+  },
+  eyeIcon: {
+    width: 24,
+    height: 24,
   },
 });
 
