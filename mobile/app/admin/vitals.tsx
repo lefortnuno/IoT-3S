@@ -5,22 +5,39 @@ import { Dimensions } from "react-native";
 import Slider from "@react-native-community/slider";
 import axios from "axios";
 
+import Info from "./info";
+import { useLocalSearchParams } from "expo-router";
+
 const screenWidth = Dimensions.get("window").width;
 
+interface User {
+  nom: string;
+  prenom: string;
+  address: string;
+  date_naiss: string;
+  email: string;
+  sexe: string;
+  coms: string;
+}
+
 export default function Vitals() {
-  const userData = {
-    nom: "LEFORT",
-    prenom: "N. Nuno",
-    address: "Rabat",
-    date_naiss: "29-07-2000",
-    email: "nuno@gmail.com",
-    sexe: "H",
-    coms: "en bonne santé",
-  };
+  const { user } = useLocalSearchParams();
+  const parsedUser: User = user
+    ? JSON.parse(user as string)
+    : {
+        nom: "Inconnu",
+        prenom: "Inconnu",
+        address: "Inconnue",
+        date_naiss: "Inconnue",
+        email: "Inconnu",
+        sexe: "Inconnu",
+        coms: "aucune information disponible",
+      };
+
   const [temperature, setTemperature] = useState(35.5);
   const [heartRate, setHeartRate] = useState(58);
   const [spo2, setSpo2] = useState(88);
-  const [intensity, setIntensity] = useState(0); // Intensité de l'exercice
+  const [intensity, setIntensity] = useState(0);
   const [heartRateData, setHeartRateData] = useState<number[]>([]);
   const [temperatureData, setTemperatureData] = useState<number[]>([]);
   const [spo2Data, setSpo2Data] = useState<number[]>([]);
@@ -30,7 +47,6 @@ export default function Vitals() {
       const multiplier = 1 + intensity / 100;
 
       if (intensity <= 30) {
-        // Variations normales pour une intensité inférieure ou égale à 30
         const newTemperature =
           temperature + (Math.random() * 0.2 - 0.1) * multiplier;
         setTemperature(newTemperature);
@@ -46,7 +62,6 @@ export default function Vitals() {
         const newSpo2 = Math.min(120, Math.max(75, spo2 + variation));
         setSpo2(parseFloat(newSpo2.toFixed(2)));
       } else {
-        // Croissance constante pour une intensité supérieure à 30
         const newTemperature = Math.min(42, temperature + 0.1 * multiplier);
         setTemperature(newTemperature);
 
@@ -57,9 +72,8 @@ export default function Vitals() {
         setSpo2(parseFloat(newSpo2.toFixed(2)));
       }
 
-      // Préparation des données pour l'API
       const vitalsData = {
-        u_id: 1,
+        u_id: 2,
         c: temperature.toFixed(1),
         bpm: Math.round(heartRate),
         spo2: Math.round(spo2),
@@ -74,10 +88,9 @@ export default function Vitals() {
           console.error("Error sending data:", error);
         });
 
-      // Mise à jour des graphiques
-      setHeartRateData((prevData) => [...prevData, heartRate].slice(-10)); // Garder les 10 dernières valeurs
-      setTemperatureData((prevData) => [...prevData, temperature].slice(-10)); // Garder les 10 dernières valeurs
-      setSpo2Data((prevData) => [...prevData, spo2].slice(-10)); // Garder les 10 dernières valeurs
+      setHeartRateData((prevData) => [...prevData, heartRate].slice(-10));
+      setTemperatureData((prevData) => [...prevData, temperature].slice(-10));
+      setSpo2Data((prevData) => [...prevData, spo2].slice(-10));
     };
 
     const interval = setInterval(simulateVitals, 2000);
@@ -87,12 +100,7 @@ export default function Vitals() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}> Information Santé </Text>
-      <Text style={styles.description}>
-        Le patient {userData.nom} {userData.prenom}, né(e) le{" "}
-        {userData.date_naiss}, résidant à {userData.address} est {userData.coms}
-        . Son email : {userData.email}.
-      </Text>
+      <Info user={parsedUser} />
 
       <View style={styles.table}>
         <View style={styles.tableRow}>
@@ -107,7 +115,6 @@ export default function Vitals() {
         </View>
       </View>
 
-      {/* Barre de progression d'intensité */}
       <View style={styles.sliderContainer}>
         <Text>Exercise Intensity: {intensity}%</Text>
         <Slider
@@ -122,8 +129,7 @@ export default function Vitals() {
           thumbTintColor="#1EB1FC"
         />
       </View>
-      {/* <View style={styles.graphContainer}> */}
-      {/* Graphique de la température */}
+
       <BarChart
         style={styles.chartGraphe}
         data={{
@@ -134,7 +140,7 @@ export default function Vitals() {
             },
           ],
         }}
-        width={(screenWidth - 30) / 1} // Ajuste la largeur pour les mettre côte à côte
+        width={screenWidth - 30}
         height={200}
         chartConfig={{
           backgroundColor: "#bcbcbc",
@@ -143,13 +149,9 @@ export default function Vitals() {
           decimalPlaces: 1,
           color: (opacity = 1) => `rgba(255, 119, 0, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
         }}
       />
 
-      {/* Graphique de la fréquence cardiaque */}
       <LineChart
         style={styles.chartGraphe}
         data={{
@@ -160,7 +162,7 @@ export default function Vitals() {
             },
           ],
         }}
-        width={(screenWidth - 30) / 1} // Ajuste la largeur pour les mettre côte à côte
+        width={screenWidth - 30}
         height={200}
         chartConfig={{
           backgroundColor: "#bcbcbc",
@@ -169,20 +171,10 @@ export default function Vitals() {
           decimalPlaces: 2,
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
-          propsForDots: {
-            r: "6",
-            strokeWidth: "2",
-            stroke: "#ffa726",
-          },
         }}
         bezier
       />
-      {/* </View> */}
 
-      {/* Graphique du SpO2 */}
       <PieChart
         data={[
           {
@@ -219,23 +211,10 @@ export default function Vitals() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, 
-    // alignItems: "center",
+    flex: 1,
     backgroundColor: "#f5f5f5",
     padding: 10,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    textAlign: "left",
-    marginVertical: 10,
-    color: "#333",
-  },
-
   sliderContainer: {
     width: "80%",
     marginTop: 10,
@@ -244,19 +223,10 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 40,
   },
-  graphContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  chartGraphe: {
     alignItems: "center",
-    width: "100%",
-    paddingHorizontal: 10,
-    marginVertical: 20,
-  },
-  chartGraphe: { 
-    alignItems:"center",
     marginBottom: 5,
   },
-
   table: {
     width: "100%",
     marginVertical: 0,

@@ -15,10 +15,23 @@ export default function RootLayout() {
           headerTitle: "Apropos",
         }}
       />
+      
       <Stack.Screen
         name="admin/vitals"
         options={{
           headerTitle: "Vitals",
+        }}
+      />
+      <Stack.Screen
+        name="admin/dashboard"
+        options={{
+          headerTitle: "Dashboard",
+        }}
+      />
+      <Stack.Screen
+        name="admin/stats"
+        options={{
+          headerTitle: "Stats",
         }}
       />
     </Stack>

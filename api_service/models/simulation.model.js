@@ -68,7 +68,7 @@ Simulation.getUser = async (value) => {
   try {
     const result = await dbConn.query("SELECT * FROM users WHERE u_id = $1", [
       value.id,
-    ]); 
+    ]);
 
     return result.rows;
   } catch (error) {
@@ -86,10 +86,10 @@ Simulation.getAll = async (values) => {
       [values.id, values.date]
     );
     // const result = await dbConn.query(
-    //   `SELECT * FROM simulations 
+    //   `SELECT * FROM simulations
     //     WHERE u_id = $1 ORDER BY id DESC`,
     //   [values.id]
-    // ); 
+    // );
 
     return result.rows;
   } catch (error) {
@@ -104,12 +104,12 @@ Simulation.getStatValue = async (values) => {
         MAX(temperature) as max_t, 
         MAX(heart_rate) as max_h, 
         MAX(pression) as max_p, 
-        MIN(temperature) as min_t, 
-        MIN(heart_rate) as min_h, 
+        MIN(temperature) as min_t,  
+        ABS(MIN(heart_rate)) as min_h, 
         MIN(pression) as min_p, 
-        AVG(temperature) as avg_t, 
-        AVG(heart_rate) as avg_h, 
-        AVG(pression) as avg_p 
+        CAST(AVG(temperature) AS FLOAT) as avg_t,  
+        CAST(AVG(heart_rate) AS FLOAT) as avg_h,  
+        CAST(AVG(pression) AS FLOAT) as avg_p
       FROM simulations 
       INNER JOIN users ON users.u_id = simulations.u_id 
       WHERE users.u_id = $1 
@@ -117,6 +117,7 @@ Simulation.getStatValue = async (values) => {
         AND created_at < $2::DATE + INTERVAL '1 day'`,
       [values.id, values.date]
     );
+    console.log("STAT ", result.rows);
 
     return result.rows;
   } catch (error) {
