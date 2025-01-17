@@ -14,7 +14,7 @@ export default function Index() {
         />
       </View>
 
-      <Link href={"/admin/dashboard"} style={styles.button}>
+      <Link href={"/ios/dashboard"} style={styles.button}>
         START
       </Link>
     </View>

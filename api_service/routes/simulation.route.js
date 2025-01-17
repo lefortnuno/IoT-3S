@@ -2,6 +2,7 @@ const router = require("express").Router();
 const SimulationController = require("../controllers/simulation.controller");
 
 router.post("/", SimulationController.add);
+router.post("/user/", SimulationController.add);
 
 router.get("/", SimulationController.getAllUsers);
 router.get("/glitch/", SimulationController.placeAuGlitch);

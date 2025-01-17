@@ -12,8 +12,8 @@ import { Dimensions } from "react-native";
 import Slider from "@react-native-community/slider";
 import axios from "axios";
 
-import Info from "./info";
-import Stat from "./stats";
+import Info from "../components/info";
+import Stat from "../components/stats";
 import { useLocalSearchParams } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
@@ -29,7 +29,7 @@ interface User {
   coms: string;
 }
 
-export default function Vitals() {
+export default function VitalsArduino() {
   const { user } = useLocalSearchParams();
 
   const parsedUser: User = user
@@ -180,7 +180,7 @@ export default function Vitals() {
                         ? `rgba(0, 0, 255, ${opacity})`
                         : temperature > 39
                         ? `rgba(255, 0, 0, ${opacity})`
-                        : `rgba(255, 165, 0, ${opacity})`, // Bleu pour froid, Orange pour normal, Rouge pour fièvre
+                        : `rgba(255, 165, 0, ${opacity})`,  
                   },
                 ],
               }}
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#2c3e50", // Couleur de titre plus foncée pour contraste
+    color: "#2c3e50",  
     marginBottom: 10,
     paddingLeft: 20,
   },

@@ -8,7 +8,9 @@ interface User {
   date_naiss: string;
   email: string;
   sexe: boolean;
-  coms: string;
+  sante: boolean;
+  libelle: string;
+  spec: string;
 }
 
 interface InfoProps {
@@ -53,9 +55,15 @@ export default function Info({ user }: InfoProps) {
         <Text style={styles.bold}>{age} ans</Text>), résidant à{" "}
         <Text style={styles.bold}>{user.adress}</Text>, est{" "}
         <Text style={styles.bold}>
-          {user.coms ? "malade" : "en bonne santé"}
+          {user.sante ? "en bonne santé" : "malade"}
         </Text>
-        . Adresse Email : <Text style={styles.bold}>{user.email}</Text>.
+        .
+      </Text>
+      <Text style={styles.description}>
+        Adresse Email : <Text style={styles.bold}>{user.email}</Text>.
+      </Text>
+      <Text style={styles.description}>
+        Appareil : <Text style={styles.bold}>{user.libelle}</Text> {user.spec}.
       </Text>
     </View>
   );
@@ -64,29 +72,29 @@ export default function Info({ user }: InfoProps) {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "#f4f7fb", // Couleur de fond douce
+    backgroundColor: "#f4f7fb",  
     borderRadius: 5,
-    shadowColor: "#000", // Ombre douce autour du conteneur
+    shadowColor: "#000",  
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
-    elevation: 3, // Effet de profondeur
+    elevation: 3,  
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#2c3e50", // Couleur de titre plus foncée pour contraste
+    color: "#2c3e50",  
     marginBottom: 10,
   },
   bold: {
     fontWeight: "bold",
-    color: "#2980b9", // Couleur bleu clair pour les mots importants
+    color: "#2980b9", 
   },
   description: {
     fontSize: 16,
-    color: "#34495e", // Texte gris clair pour une bonne lisibilité
-    lineHeight: 24, // Améliorer l'interligne pour rendre le texte plus aéré
+    color: "#34495e",  
+    lineHeight: 24,  
     textAlign: "left",
-    marginTop: 10,
+    marginTop: 5,
   },
 });

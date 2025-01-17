@@ -54,14 +54,21 @@ const Dashboard = () => {
   };
 
   const navigateToVitals = (user: User) => {
-    router.push({
-      pathname: "/admin/vitals",
-      params: { user: JSON.stringify(user) },
-    });
+    if (user.u_id >= 4) {
+      router.push({
+        pathname: "/ios/vitals",
+        params: { user: JSON.stringify(user) },
+      });
+    } else {
+      router.push({
+        pathname: "/arduino/vitals",
+        params: { user: JSON.stringify(user) },
+      });
+    }
   };
 
   const navigateToAddUser = () => {
-    router.push("/admin/addUser"); // Modifier l'URL de la page d'ajout d'utilisateur
+    router.push("/components/addUser");
   };
 
   return (
@@ -102,7 +109,7 @@ const Dashboard = () => {
           <View style={styles.header}>
             <Text style={styles.headerCell}>Nom</Text>
             <Text style={styles.headerCell}>Prénom</Text>
-            <Text style={styles.headerCell}>Birthday</Text>
+            <Text style={styles.headerCell}>D. Naiss</Text>
             <Text style={styles.headerCell}>Adresse</Text>
             <Text style={styles.headerCell}>Email</Text>
             <Text style={styles.headerCell}>Détails</Text>
@@ -116,23 +123,23 @@ const Dashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa", // Légère couleur de fond
+    backgroundColor: "#f8f9fa",
     padding: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#1E3A8A", // Bleu sombre pour un look professionnel
+    color: "#1E3A8A",
     textAlign: "center",
     marginBottom: 20,
   },
   header: {
     flexDirection: "row",
-    backgroundColor: "#1E3A8A", // Fond bleu clair pour l'en-tête
+    backgroundColor: "#1E3A8A",
     paddingVertical: 12,
     borderRadius: 5,
     marginBottom: 10,
-    elevation: 3, // Ombre pour effet 3D
+    elevation: 3,
   },
   headerCell: {
     flex: 1,
@@ -152,7 +159,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 4, // Ombre pour effet 3D sur les lignes
+    elevation: 4,
   },
   cell: {
     flex: 1,
@@ -174,9 +181,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 5,
     marginBottom: 20,
-    flexDirection: "row", // Aligner le texte et l'image horizontalement
-    alignItems: "center", // Centrer verticalement
-    justifyContent: "center", // Centrer horizontalement
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     width: 120,
   },
   addButtonText: {
@@ -187,7 +194,7 @@ const styles = StyleSheet.create({
   addIcon: {
     width: 20,
     height: 20,
-    marginLeft: 10, // Espacement entre le texte et l'icône
+    marginLeft: 10,
   },
 });
 

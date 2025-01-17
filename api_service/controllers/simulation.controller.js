@@ -18,10 +18,30 @@ module.exports.add = async (req, res) => {
     temperature: data.c,
     heart_rate: data.bpm,
     pression: data.spo2,
-  }; 
+  };
 
   try {
     const result = await Simulation.add(newData);
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+module.exports.addUser = async (req, res) => {
+  let data = req.body;
+
+  const newData = {
+    nom: data.nom,
+    prenom: data.prenom,
+    date_naiss: data.date_naiss,
+    sexe: data.sexe,
+    adress: data.adress,
+    email: data.email,
+  };
+
+  try {
+    const result = await Simulation.addUser(newData);
     res.status(200).send(result);
   } catch (error) {
     res.status(500).send(error);

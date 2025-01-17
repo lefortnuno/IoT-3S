@@ -1,5 +1,7 @@
 DROP TABLE IF EXISTS simulations;
 
+DROP TABLE IF EXISTS appareils;
+
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
@@ -8,10 +10,10 @@ CREATE TABLE users (
     prenom varchar(100),
     date_naiss date,
     sexe boolean DEFAULT true,
-    -- FALSE pour les Filles/Femmes 
+    sante boolean DEFAULT true,
+    -- FALSE: Filles/Femmes | malade 
     adress varchar(50),
-    email varchar(50),
-    pic VARCHAR(50) DEFAULT NULL
+    email varchar(50)
 );
 
 CREATE TABLE simulations (
@@ -20,8 +22,21 @@ CREATE TABLE simulations (
     temperature FLOAT DEFAULT NULL,
     heart_rate INT DEFAULT NULL,
     pression INT DEFAULT NULL,
+    coms VARCHAR(150) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_users FOREIGN KEY ("u_id") REFERENCES users(u_id) ON DELETE CASCADE
+);
+
+CREATE TABLE appareils (
+    id SERIAL PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL,
+    spec VARCHAR(50) DEFAULT NULL,
+    etat BOOLEAN DEFAULT true,
+    -- FALSE: Endommagé
+    u_id INT UNIQUE,
+    CONSTRAINT fk_users_appareil FOREIGN KEY (u_id) REFERENCES users(u_id) ON DELETE
+    SET
+        NULL
 );
 
 INSERT INTO
@@ -33,18 +48,18 @@ INSERT INTO
         sexe,
         adress,
         email,
-        pic
+        sante
     )
 VALUES
     (
         1,
-        'LEFORT',
-        'Nomenjanahary Nuno',
-        '2000-07-29',
-        't',
+        'BENABOUB',
+        'Hafssa',
+        '1975-05-17',
+        'f',
         'Rabat-salé',
-        'nunolefort6@gmail.com',
-        'uploads/trofel.png'
+        'benaboud@um5r.ac.ma',
+        't'
     ),
     (
         2,
@@ -54,22 +69,45 @@ VALUES
         't',
         'Rabat-Agdal',
         'yayamohamedhen@gmail.com',
-        'uploads/yaya.png'
+        't'
     ),
     (
         3,
-        'YOUSSAIRE',
-        'Khoulia',
+        'YOUSSRA',
+        'Khoulai',
         '1980-01-07',
         'f',
         'Rabat-Kenitra',
         'woman@gmail.com',
-        'uploads/woman.png'
+        'f'
+    ),
+    (
+        4,
+        'LEFORT',
+        'Nomenjanahary Nuno',
+        '2000-07-29',
+        't',
+        'Rabat-Tabriquet',
+        'nunolefort6@gmail.com',
+        't'
     );
 
 INSERT INTO
     simulations (u_id, temperature, heart_rate, pression)
 VALUES
-    (1, 41.10, 112, 98),
-    (2, 41.90, 113, 95),
-    (3, 40.50, 111, 91);
+    (1, 32.10, 61, 86),
+    (2, 33.90, 35, 87),
+    (3, 39.90, 48, 95),
+    (4, 33.50, 63, 88);
+
+INSERT INTO
+    appareils (libelle, spec, u_id)
+VALUES
+    ('Adruino-Uno', 'R3, ATmega328P, 5V', 1),
+    ('Adruino-Uno', 'R2, ATmega121Y, 3V', 2),
+    (
+        'Bague Samsung',
+        'Galaxy Ring, Bluetooth, 5 jours',
+        3
+    ),
+    ('Apple watch', 'Series 8, GPS, ECG', 4);

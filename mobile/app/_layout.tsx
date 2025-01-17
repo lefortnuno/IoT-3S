@@ -17,19 +17,19 @@ export default function RootLayout() {
       />
       
       <Stack.Screen
-        name="admin/vitals"
+        name="ios/vitals"
         options={{
           headerTitle: "Vitals",
         }}
       />
       <Stack.Screen
-        name="admin/dashboard"
+        name="ios/dashboard"
         options={{
           headerTitle: "Dashboard",
         }}
       />
       <Stack.Screen
-        name="admin/stats"
+        name="components/stats"
         options={{
           headerTitle: "Stats",
         }}
