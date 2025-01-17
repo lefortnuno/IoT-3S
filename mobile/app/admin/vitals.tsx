@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { LineChart, BarChart, PieChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import Slider from "@react-native-community/slider";
 import axios from "axios";
 
 import Info from "./info";
+import Stat from "./stats";
 import { useLocalSearchParams } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
 
 interface User {
+  u_id: number;
   nom: string;
   prenom: string;
   address: string;
@@ -22,9 +31,11 @@ interface User {
 
 export default function Vitals() {
   const { user } = useLocalSearchParams();
+
   const parsedUser: User = user
     ? JSON.parse(user as string)
     : {
+        u_id: 1,
         nom: "Inconnu",
         prenom: "Inconnu",
         address: "Inconnue",
@@ -41,6 +52,7 @@ export default function Vitals() {
   const [heartRateData, setHeartRateData] = useState<number[]>([]);
   const [temperatureData, setTemperatureData] = useState<number[]>([]);
   const [spo2Data, setSpo2Data] = useState<number[]>([]);
+  const [isStat, setIsStat] = useState(true);
 
   useEffect(() => {
     const simulateVitals = () => {
@@ -98,6 +110,10 @@ export default function Vitals() {
     return () => clearInterval(interval);
   }, [temperature, heartRate, spo2, intensity]);
 
+  const showToStats = () => {
+    setIsStat(!isStat);
+  };
+
   return (
     <View style={styles.container}>
       <Info user={parsedUser} />
@@ -115,103 +131,139 @@ export default function Vitals() {
         </View>
       </View>
 
-      <View style={styles.sliderContainer}>
-        <Text style={styles.bbold}>Simulation d'Exercice: {intensity}%</Text>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={100}
-          step={1}
-          value={intensity}
-          onValueChange={setIntensity}
-          minimumTrackTintColor="#1EB1FC"
-          maximumTrackTintColor="#D3D3D3"
-          thumbTintColor="#1EB1FC"
-        />
+      <View style={styles.sliderAndButtonContainer}>
+        <View style={styles.sliderContainer}>
+          <Text style={styles.bbold}>Simulation d'Exercice: {intensity}%</Text>
+          <Slider
+            style={styles.slider}
+            minimumValue={0}
+            maximumValue={100}
+            step={1}
+            value={intensity}
+            onValueChange={setIntensity}
+            minimumTrackTintColor="#1EB1FC"
+            maximumTrackTintColor="#D3D3D3"
+            thumbTintColor="#1EB1FC"
+          />
+        </View>
+        <TouchableOpacity
+          style={styles.eyeButton}
+          onPress={() => setIsStat(!isStat)}
+        >
+          <Image
+            source={require("../../assets/images/diagramme.png")}
+            style={styles.eyeIcon}
+          />
+        </TouchableOpacity>
       </View>
 
-      {/* ScrollView to make charts scrollable */}
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <BarChart
-          style={styles.chartGraphe}
-          data={{
-            labels: new Array(temperatureData.length).fill(""),
-            datasets: [
-              {
-                data: temperatureData,
-              },
-            ],
-          }}
-          width={screenWidth - 30}
-          height={200}
-          chartConfig={{
-            backgroundColor: "#bcbcbc",
-            backgroundGradientFrom: "#bcbcbc",
-            backgroundGradientTo: "#bcbcbc",
-            decimalPlaces: 1,
-            color: (opacity = 1) => `rgba(255, 119, 0, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          }}
-        />
+      {isStat ? (
+        <>
+          <Text style={styles.title}>Signe Vitaux</Text>
 
-        <LineChart
-          style={styles.chartGraphe}
-          data={{
-            labels: new Array(heartRateData.length).fill(""),
-            datasets: [
-              {
-                data: heartRateData,
-              },
-            ],
-          }}
-          width={screenWidth - 30}
-          height={200}
-          chartConfig={{
-            backgroundColor: "#bcbcbc",
-            backgroundGradientFrom: "#bcbcbc",
-            backgroundGradientTo: "#bcbcbc",
-            decimalPlaces: 2,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
-          }}
-          bezier
-        />
+          <ScrollView
+            style={styles.scrollContainer}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Title for Temperature Chart */}
+            <Text style={styles.chartTitle}>Température</Text>
+            <BarChart
+              style={styles.chartGraphe}
+              data={{
+                labels: new Array(temperatureData.length).fill(""),
+                datasets: [
+                  {
+                    data: temperatureData,
+                    color: (opacity = 1) =>
+                      temperature < 36
+                        ? `rgba(0, 0, 255, ${opacity})`
+                        : temperature > 39
+                        ? `rgba(255, 0, 0, ${opacity})`
+                        : `rgba(255, 165, 0, ${opacity})`, // Bleu pour froid, Orange pour normal, Rouge pour fièvre
+                  },
+                ],
+              }}
+              width={screenWidth - 30}
+              height={200}
+              chartConfig={{
+                backgroundColor: "#bcbcbc",
+                backgroundGradientFrom: "#bcbcbc",
+                backgroundGradientTo: "#bcbcbc",
+                decimalPlaces: 1,
+                color: (opacity = 1) =>
+                  temperature < 36
+                    ? `rgba(0, 0, 255, ${opacity})`
+                    : temperature > 39
+                    ? `rgba(255, 0, 0, ${opacity})`
+                    : `rgba(255, 165, 0, ${opacity})`, // Bleu, Orange, Rouge selon la température
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              }}
+            />
 
-        <PieChart
-          data={[
-            {
-              name: "SpO2",
-              population: spo2,
-              color: "rgba(0, 255, 0, 1)",
-              legendFontColor: "#7F7F7F",
-              legendFontSize: 15,
-            },
-            {
-              name: "Rest",
-              population: parseFloat((120 - spo2).toFixed(2)),
-              color: "rgba(192, 192, 192, 1)",
-              legendFontColor: "#7F7F7F",
-              legendFontSize: 15,
-            },
-          ]}
-          width={screenWidth - 40}
-          height={180}
-          chartConfig={{
-            backgroundColor: "#a6a6a6",
-            backgroundGradientFrom: "#a6a6a6",
-            backgroundGradientTo: "#a6a6a6",
-            color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
-          }}
-          accessor={"population"}
-          backgroundColor={"transparent"}
-          paddingLeft={"15"}
-          absolute
-        />
-      </ScrollView>
+            {/* Title for Heart Rate Chart */}
+            <Text style={styles.chartTitle}>Fréquence Cardiaque</Text>
+            <LineChart
+              style={styles.chartGraphe}
+              data={{
+                labels: new Array(heartRateData.length).fill(""),
+                datasets: [
+                  {
+                    data: heartRateData,
+                  },
+                ],
+              }}
+              width={screenWidth - 30}
+              height={200}
+              chartConfig={{
+                backgroundColor: "#bcbcbc",
+                backgroundGradientFrom: "#bcbcbc",
+                backgroundGradientTo: "#bcbcbc",
+                decimalPlaces: 2,
+                color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
+              }}
+              bezier
+            />
+
+            {/* Title for SpO2 Chart */}
+            <Text style={styles.chartTitle}>SpO2</Text>
+            <PieChart
+              data={[
+                {
+                  name: "SpO2",
+                  population: spo2,
+                  color:
+                    spo2 < 105 ? "rgba(0, 255, 0, 1)" : "rgba(255, 0, 0, 1)",
+                  legendFontColor: "#7F7F7F",
+                  legendFontSize: 15,
+                },
+                {
+                  name: "Rest",
+                  population: parseFloat((120 - spo2).toFixed(2)),
+                  color: "rgba(192, 192, 192, 1)",
+                  legendFontColor: "#7F7F7F",
+                  legendFontSize: 15,
+                },
+              ]}
+              width={screenWidth - 40}
+              height={180}
+              chartConfig={{
+                backgroundColor: "#a6a6a6",
+                backgroundGradientFrom: "#a6a6a6",
+                backgroundGradientTo: "#a6a6a6",
+                color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
+              }}
+              accessor={"population"}
+              backgroundColor={"transparent"}
+              paddingLeft={"15"}
+              absolute
+            />
+          </ScrollView>
+        </>
+      ) : (
+        <Stat u_id={parsedUser.u_id} />
+      )}
     </View>
   );
 }
@@ -222,24 +274,53 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     padding: 10,
   },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#2c3e50", // Couleur de titre plus foncée pour contraste
+    marginBottom: 10,
+    paddingLeft: 20,
+  },
+  sliderAndButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 15,
+  },
   sliderContainer: {
     width: "80%",
-    marginTop: 10,
   },
   slider: {
     width: "100%",
     height: 40,
   },
+  eyeButton: {
+    width: "20%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  eyeIcon: {
+    width: 24,
+    height: 24,
+  },
   chartGraphe: {
     alignItems: "center",
     marginBottom: 5,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 10,
+    color: "#333",
+    paddingLeft: 5,
   },
   table: {
     width: "100%",
     marginVertical: 0,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 8,
+    borderRadius: 5,
     backgroundColor: "#fff",
   },
   tableRow: {
@@ -261,8 +342,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#555",
   },
-  bbold: { 
-    fontWeight: "bold", 
+  bbold: {
+    fontWeight: "bold",
   },
   scrollContainer: {
     flex: 1,

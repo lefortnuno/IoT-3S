@@ -60,9 +60,23 @@ const Dashboard = () => {
     });
   };
 
+  const navigateToAddUser = () => {
+    router.push("/admin/addUser"); // Modifier l'URL de la page d'ajout d'utilisateur
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Liste des Utilisateurs</Text>
+
+      {/* Bouton Ajouter un utilisateur */}
+      <TouchableOpacity style={styles.addButton} onPress={navigateToAddUser}>
+        <Text style={styles.addButtonText}>Nouveau</Text>
+        <Image
+          source={require("../../assets/images/ajouter.png")}
+          style={styles.addIcon}
+        />
+      </TouchableOpacity>
+
       <FlatList
         data={users}
         keyExtractor={(item) => item.u_id.toString()}
@@ -88,7 +102,7 @@ const Dashboard = () => {
           <View style={styles.header}>
             <Text style={styles.headerCell}>Nom</Text>
             <Text style={styles.headerCell}>Prénom</Text>
-            <Text style={styles.headerCell}>Date de Naissance</Text>
+            <Text style={styles.headerCell}>Birthday</Text>
             <Text style={styles.headerCell}>Adresse</Text>
             <Text style={styles.headerCell}>Email</Text>
             <Text style={styles.headerCell}>Détails</Text>
@@ -114,9 +128,9 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    backgroundColor: "#3498db", // Fond bleu clair pour l'en-tête
+    backgroundColor: "#1E3A8A", // Fond bleu clair pour l'en-tête
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 5,
     marginBottom: 10,
     elevation: 3, // Ombre pour effet 3D
   },
@@ -133,7 +147,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 10,
     marginVertical: 8,
-    borderRadius: 10,
+    borderRadius: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -154,6 +168,26 @@ const styles = StyleSheet.create({
   eyeIcon: {
     width: 24,
     height: 24,
+  },
+  addButton: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginBottom: 20,
+    flexDirection: "row", // Aligner le texte et l'image horizontalement
+    alignItems: "center", // Centrer verticalement
+    justifyContent: "center", // Centrer horizontalement
+    width: 120,
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  addIcon: {
+    width: 20,
+    height: 20,
+    marginLeft: 10, // Espacement entre le texte et l'icône
   },
 });
 

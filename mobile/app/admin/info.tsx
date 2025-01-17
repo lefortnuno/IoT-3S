@@ -55,8 +55,7 @@ export default function Info({ user }: InfoProps) {
         <Text style={styles.bold}>
           {user.coms ? "malade" : "en bonne santé"}
         </Text>
-        . Adresse Email :{" "}
-        <Text style={styles.bold}>{user.email}</Text>.
+        . Adresse Email : <Text style={styles.bold}>{user.email}</Text>.
       </Text>
     </View>
   );
@@ -66,7 +65,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     backgroundColor: "#f4f7fb", // Couleur de fond douce
-    borderRadius: 10,
+    borderRadius: 5,
     shadowColor: "#000", // Ombre douce autour du conteneur
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,

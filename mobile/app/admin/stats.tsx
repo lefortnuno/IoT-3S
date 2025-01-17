@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BarChart } from "react-native-chart-kit";
-import { Dimensions, View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  Dimensions,
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -18,7 +25,7 @@ interface Stat {
 }
 
 interface Props {
-  u_id2: number;
+  u_id: number;
 }
 
 const StatChart: React.FC<{
@@ -29,7 +36,7 @@ const StatChart: React.FC<{
 }> = ({ title, labels, todayData, yesterdayData }) => {
   const mergedData = labels.flatMap((label, index) => [
     { value: yesterdayData[index], color: "rgba(255, 182, 193, 1)" }, // Pink for yesterday
-    { value: todayData[index], color: "rgba(135, 206, 250, 1)" }, // Blue for today
+    { value: todayData[index], color: "rgba(13, 50, 240, 1)" }, // Blue for today
   ]);
 
   return (
@@ -37,7 +44,10 @@ const StatChart: React.FC<{
       <Text style={styles.chartTitle}>{title}</Text>
       <BarChart
         data={{
-          labels: labels.flatMap((label) => [`Hier - ${label}`, `Aujourd'hui - ${label}`]),
+          labels: labels.flatMap((label) => [
+            `Hier - ${label}`,
+            `Aujourd'hui - ${label}`,
+          ]),
           datasets: [
             {
               data: mergedData.map((item) => item.value),
@@ -46,13 +56,13 @@ const StatChart: React.FC<{
           ],
         }}
         width={screenWidth - 40}
-        height={100}
+        height={180}
         chartConfig={{
           backgroundColor: "#f0f0f0",
           backgroundGradientFrom: "#f0f0f0",
           backgroundGradientTo: "#e0e0e0",
           decimalPlaces: 1,
-          color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
+          color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
           style: { borderRadius: 8 },
         }}
@@ -63,7 +73,7 @@ const StatChart: React.FC<{
   );
 };
 
-const Stat: React.FC<Props> = ({ u_id2 }) => {
+const Stat: React.FC<Props> = ({ u_id }) => {
   const [statToday, setStatToday] = useState<Stat | null>(null);
   const [statYesterday, setStatYesterday] = useState<Stat | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,19 +84,24 @@ const Stat: React.FC<Props> = ({ u_id2 }) => {
   const fetchStats = async () => {
     setLoading(true);
     setError(null);
-    try {
-      const u_id = 2;
+    try { 
       const today = formatDate(new Date());
       const yesterday = formatDate(new Date(Date.now() - 86400000));
       const [todayRes, yesterdayRes] = await Promise.all([
-        axios.get<Stat[]>(`http://192.168.1.10:5111/api/simulation/stat/${u_id}?date=${today}`),
-        axios.get<Stat[]>(`http://192.168.1.10:5111/api/simulation/stat/${u_id}?date=${yesterday}`),
+        axios.get<Stat[]>(
+          `http://192.168.1.10:5111/api/simulation/stat/${u_id}?date=${today}`
+        ),
+        axios.get<Stat[]>(
+          `http://192.168.1.10:5111/api/simulation/stat/${u_id}?date=${yesterday}`
+        ),
       ]);
 
       setStatToday(todayRes.data[0] || null);
       setStatYesterday(yesterdayRes.data[0] || null);
     } catch (err) {
-      setError("Erreur lors du chargement des données. Vérifiez votre connexion.");
+      setError(
+        "Erreur lors du chargement des données. Vérifiez votre connexion."
+      );
     } finally {
       setLoading(false);
     }
@@ -94,13 +109,13 @@ const Stat: React.FC<Props> = ({ u_id2 }) => {
 
   useEffect(() => {
     fetchStats();
-  }, [u_id2]);
+  }, [u_id]);
 
   if (loading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#000" />
-        <Text>Chargement des données...</Text>
+        <Text style={styles.loadingText}>Chargement des données...</Text>
       </View>
     );
   }
@@ -117,29 +132,44 @@ const Stat: React.FC<Props> = ({ u_id2 }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Statistiques : Hier & Aujourd'hui</Text>
+      <Text style={styles.title}>Review Stats</Text>
       {isDataValid ? (
-        <>
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <StatChart
             title="Température"
             labels={["Max", "Min", "Moyenne"]}
             todayData={[statToday.max_t, statToday.min_t, statToday.avg_t]}
-            yesterdayData={[statYesterday.max_t, statYesterday.min_t, statYesterday.avg_t]}
+            yesterdayData={[
+              statYesterday.max_t,
+              statYesterday.min_t,
+              statYesterday.avg_t,
+            ]}
           />
           <StatChart
             title="Heart Rate"
             labels={["Max", "Min", "Moyenne"]}
             todayData={[statToday.max_h, statToday.min_h, statToday.avg_h]}
-            yesterdayData={[statYesterday.max_h, statYesterday.min_h, statYesterday.avg_h]}
+            yesterdayData={[
+              statYesterday.max_h,
+              statYesterday.min_h,
+              statYesterday.avg_h,
+            ]}
           />
           <StatChart
             title="SpO2"
             labels={["Max", "Min", "Moyenne"]}
             todayData={[statToday.max_p, statToday.min_p, statToday.avg_p]}
-            yesterdayData={[statYesterday.max_p, statYesterday.min_p, statYesterday.avg_p]}
+            yesterdayData={[
+              statYesterday.max_p,
+              statYesterday.min_p,
+              statYesterday.avg_p,
+            ]}
           />
 
-          
           {/* Tableau des moyennes */}
           <View style={styles.tableContainer}>
             <View style={styles.tableRow}>
@@ -169,9 +199,9 @@ const Stat: React.FC<Props> = ({ u_id2 }) => {
               <Text style={styles.tableCell}>{statToday.avg_p.toFixed(2)}</Text>
             </View>
           </View>
-        </>
+        </ScrollView>
       ) : (
-        <Text>Aucune donnée disponible.</Text>
+        <Text style={styles.noDataText}>Aucune donnée disponible.</Text>
       )}
     </View>
   );
@@ -179,32 +209,42 @@ const Stat: React.FC<Props> = ({ u_id2 }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#f5f5f5", 
+    flex: 1, 
+    backgroundColor: "#f5f5f5",
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
+    color: "#2c3e50", // Couleur de titre plus foncée pour contraste
+    marginBottom: 10,
+    paddingLeft: 20, 
   },
   chartContainer: {
-    marginVertical: 10,
+    marginVertical: 15,
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 5,
+    elevation: 3,
   },
   chartTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10, 
+    color: "#333",
+    marginBottom: 10,
+  },
+  loadingText: {
+    textAlign: "center",
+    marginTop: 10,
+    color: "#555",
   },
   errorText: {
     color: "red",
     textAlign: "center",
     marginTop: 20,
-  },   
+  },
   tableContainer: {
     marginTop: 20,
-    padding: 10,
+    padding: 15,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
@@ -213,18 +253,34 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#eee",
   },
   tableHeader: {
     fontWeight: "bold",
-    width: "33%",
+    fontSize: 16,
     textAlign: "center",
+    color: "#333",
+    flex: 1,
   },
   tableCell: {
-    width: "33%",
+    fontSize: 16,
     textAlign: "center",
+    color: "#555",
+    flex: 1,
+  },
+  noDataText: {
+    textAlign: "center",
+    color: "#888",
+    marginTop: 20,
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 20,
   },
 });
+
 export default Stat;
