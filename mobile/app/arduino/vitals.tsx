@@ -46,17 +46,17 @@ export default function VitalsArduino() {
         sante: "Inconnu",
       };
 
-  const [temperature, setTemperature] = useState(35.5);
+  const [temperature, setTemperature] = useState(36.5);
   const [heartRateData, setHeartRateData] = useState<number[]>([]);
-  const [lastTemperature, setLastTemperature] = useState(35.5);
+  const [lastTemperature, setLastTemperature] = useState(36.5);
 
-  const [heartRate, setHeartRate] = useState(58);
+  const [heartRate, setHeartRate] = useState(65);
   const [temperatureData, setTemperatureData] = useState<number[]>([]);
-  const [lastHeartRate, setLastHeartRate] = useState(58);
+  const [lastHeartRate, setLastHeartRate] = useState(65);
 
-  const [spo2, setSpo2] = useState(88);
+  const [spo2, setSpo2] = useState(95);
   const [spo2Data, setSpo2Data] = useState<number[]>([]);
-  const [lastSpo2, setLastSpo2] = useState(88);
+  const [lastSpo2, setLastSpo2] = useState(95);
 
   const [isStat, setIsStat] = useState(true);
 
@@ -144,7 +144,7 @@ export default function VitalsArduino() {
             setLastSpo2(newSpo2);
             setSpo2Data((prevData) => [...prevData, newSpo2].slice(-10));
 
-            if (newTemperature > 59) {
+            if (newTemperature > 39.5) {
               Notifications.scheduleNotificationAsync({
                 content: {
                   title: "⚠️ Température élevée !",
@@ -155,7 +155,7 @@ export default function VitalsArduino() {
               });
             }
 
-            if (newHeartRate > 295) {
+            if (newHeartRate > 120) {
               Notifications.scheduleNotificationAsync({
                 content: {
                   title: "⚠️ Fréquence cardiaque élevée !",
@@ -166,7 +166,7 @@ export default function VitalsArduino() {
               });
             }
 
-            if (newSpo2 > 201) {
+            if (newSpo2 < 89) {
               Notifications.scheduleNotificationAsync({
                 content: {
                   title: "⚠️ Niveau de SpO2 élevé !",
@@ -254,9 +254,9 @@ export default function VitalsArduino() {
                   {
                     data: temperatureData,
                     color: (opacity = 1) =>
-                      temperature < 36
+                      temperature < 37
                         ? `rgba(0, 0, 255, ${opacity})`
-                        : temperature > 39
+                        : temperature > 39.5
                         ? `rgba(255, 0, 0, ${opacity})`
                         : `rgba(255, 165, 0, ${opacity})`,
                   },
@@ -270,9 +270,9 @@ export default function VitalsArduino() {
                 backgroundGradientTo: "#bcbcbc",
                 decimalPlaces: 1,
                 color: (opacity = 1) =>
-                  temperature < 36
+                  temperature < 37
                     ? `rgba(0, 0, 255, ${opacity})`
-                    : temperature > 39
+                    : temperature > 39.5
                     ? `rgba(255, 0, 0, ${opacity})`
                     : `rgba(255, 165, 0, ${opacity})`, // Bleu, Orange, Rouge selon la température
                 labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
@@ -292,7 +292,7 @@ export default function VitalsArduino() {
                   {
                     data: heartRateData.length > 0 ? heartRateData : [0],
                     color: (opacity = 1) =>
-                      heartRate < 81
+                      heartRate < 120
                         ? `rgba(0, 255, 0, ${opacity})`
                         : `rgba(255, 0, 0, ${opacity})`,
                   },
@@ -306,7 +306,7 @@ export default function VitalsArduino() {
                 backgroundGradientTo: "#bcbcbc",
                 decimalPlaces: 2,
                 color: (opacity = 1) =>
-                  heartRate < 81
+                  heartRate < 120
                     ? `rgba(0, 255, 0, ${opacity})`
                     : `rgba(255, 0, 0, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
@@ -322,13 +322,13 @@ export default function VitalsArduino() {
                   name: "SpO2",
                   population: spo2,
                   color:
-                    spo2 < 105 ? "rgba(0, 255, 0, 1)" : "rgba(255, 0, 0, 1)",
+                    spo2 < 89 ? "rgba(255, 0, 0, 1)" : "rgba(0, 255, 0, 1)",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 15,
                 },
                 {
                   name: "Rest",
-                  population: parseFloat((120 - spo2).toFixed(2)),
+                  population: parseFloat((105 - spo2).toFixed(2)),
                   color: "rgba(192, 192, 192, 1)",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 15,

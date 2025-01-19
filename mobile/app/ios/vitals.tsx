@@ -46,9 +46,9 @@ export default function Vitals() {
         sante: "Inconnu",
       };
 
-  const [temperature, setTemperature] = useState(35.5);
-  const [heartRate, setHeartRate] = useState(58);
-  const [spo2, setSpo2] = useState(88);
+  const [temperature, setTemperature] = useState(36.5);
+  const [heartRate, setHeartRate] = useState(65);
+  const [spo2, setSpo2] = useState(92);
   const [intensity, setIntensity] = useState(0);
   const [heartRateData, setHeartRateData] = useState<number[]>([]);
   const [temperatureData, setTemperatureData] = useState<number[]>([]);
@@ -118,21 +118,21 @@ export default function Vitals() {
         newTemperature = temperature + (Math.random() * 0.2 - 0.1) * multiplier;
 
         const variationH = (Math.random() * 4 - 2) * multiplier;
-        newHeartRate = Math.min(120, Math.max(45, heartRate + variationH));
+        newHeartRate = Math.min(125, Math.max(45, heartRate + variationH));
 
         const variation = (Math.random() * 2 - 1) * multiplier;
-        newSpo2 = Math.min(120, Math.max(75, spo2 + variation));
+        newSpo2 = Math.min(105, Math.max(85, spo2 + variation));
       } else {
         newTemperature = Math.min(42, temperature + 0.1 * multiplier);
-        newHeartRate = Math.min(120, heartRate + 1 * multiplier);
-        newSpo2 = Math.min(120, spo2 + 0.5 * multiplier);
+        newHeartRate = Math.min(125, heartRate + 1 * multiplier);
+        newSpo2 = Math.min(105, spo2 + 0.5 * multiplier);
       }
 
       setTemperature(newTemperature);
       setHeartRate(parseFloat(newHeartRate.toFixed(2)));
       setSpo2(parseFloat(newSpo2.toFixed(2)));
 
-      if (newTemperature > 39) {
+      if (newTemperature > 39.5) {
         Notifications.scheduleNotificationAsync({
           content: {
             title: "⚠️ Température élevée !",
@@ -142,7 +142,7 @@ export default function Vitals() {
           trigger: null,
         });
       }
-      if (newHeartRate > 75) {
+      if (newHeartRate > 120) {
         Notifications.scheduleNotificationAsync({
           content: {
             title: "⚠️ Fréquence cardiaque élevée !",
@@ -152,7 +152,7 @@ export default function Vitals() {
           trigger: null,
         });
       }
-      if (newSpo2 > 101) {
+      if (newSpo2 < 89) {
         Notifications.scheduleNotificationAsync({
           content: {
             title: "⚠️ Niveau de SpO2 élevé !",
@@ -255,9 +255,9 @@ export default function Vitals() {
                   {
                     data: temperatureData,
                     color: (opacity = 1) =>
-                      temperature < 36
+                      temperature < 37
                         ? `rgba(0, 0, 255, ${opacity})`
-                        : temperature > 39
+                        : temperature > 39.5
                         ? `rgba(255, 0, 0, ${opacity})`
                         : `rgba(255, 165, 0, ${opacity})`,
                   },
@@ -271,9 +271,9 @@ export default function Vitals() {
                 backgroundGradientTo: "#bcbcbc",
                 decimalPlaces: 1,
                 color: (opacity = 1) =>
-                  temperature < 36
+                  temperature < 37
                     ? `rgba(0, 0, 255, ${opacity})`
-                    : temperature > 39
+                    : temperature > 39.5
                     ? `rgba(255, 0, 0, ${opacity})`
                     : `rgba(255, 165, 0, ${opacity})`, // Bleu, Orange, Rouge selon la température
                 labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
@@ -293,7 +293,7 @@ export default function Vitals() {
                   {
                     data: heartRateData.length > 0 ? heartRateData : [0],
                     color: (opacity = 1) =>
-                      heartRate < 81
+                      heartRate < 120
                         ? `rgba(0, 255, 0, ${opacity})`
                         : `rgba(255, 0, 0, ${opacity})`,
                   },
@@ -307,7 +307,7 @@ export default function Vitals() {
                 backgroundGradientTo: "#bcbcbc",
                 decimalPlaces: 2,
                 color: (opacity = 1) =>
-                  heartRate < 81
+                  heartRate < 120
                     ? `rgba(0, 255, 0, ${opacity})`
                     : `rgba(255, 0, 0, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
@@ -323,13 +323,13 @@ export default function Vitals() {
                   name: "SpO2",
                   population: spo2,
                   color:
-                    spo2 < 105 ? "rgba(0, 255, 0, 1)" : "rgba(255, 0, 0, 1)",
+                    spo2 < 89 ? "rgba(255, 0, 0, 1)" : "rgba(0, 255, 0, 1)",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 15,
                 },
                 {
                   name: "Rest",
-                  population: parseFloat((120 - spo2).toFixed(2)),
+                  population: parseFloat((105 - spo2).toFixed(2)),
                   color: "rgba(192, 192, 192, 1)",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 15,
