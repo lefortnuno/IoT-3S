@@ -35,8 +35,8 @@ const StatChart: React.FC<{
   yesterdayData: number[];
 }> = ({ title, labels, todayData, yesterdayData }) => {
   const mergedData = labels.flatMap((label, index) => [
-    { value: yesterdayData[index], color: "rgba(255, 182, 193, 1)" }, // Pink for yesterday
-    { value: todayData[index], color: "rgba(13, 50, 240, 1)" }, // Blue for today
+    { value: yesterdayData[index], color: "rgba(255, 182, 193, 1)" },
+    { value: todayData[index], color: "rgba(13, 50, 240, 1)" },
   ]);
 
   return (
@@ -84,7 +84,7 @@ const Stat: React.FC<Props> = ({ u_id }) => {
   const fetchStats = async () => {
     setLoading(true);
     setError(null);
-    try { 
+    try {
       const today = formatDate(new Date());
       const yesterday = formatDate(new Date(Date.now() - 86400000));
       const [todayRes, yesterdayRes] = await Promise.all([
@@ -209,15 +209,15 @@ const Stat: React.FC<Props> = ({ u_id }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, 
+    flex: 1,
     backgroundColor: "#f5f5f5",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#2c3e50", // Couleur de titre plus foncée pour contraste
+    color: "#2c3e50",
     marginBottom: 10,
-    paddingLeft: 20, 
+    paddingLeft: 20,
   },
   chartContainer: {
     marginVertical: 15,

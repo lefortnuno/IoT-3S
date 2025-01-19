@@ -1,7 +1,19 @@
+import * as Notifications from "expo-notifications";
 import { Link } from "expo-router";
+import React, { useEffect } from "react";
 import { Text, Image, View, StyleSheet } from "react-native";
 
 export default function Index() {
+  useEffect(() => {
+    const askForNotificationPermission = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission not granted for notifications");
+      }
+    };
+
+    askForNotificationPermission();
+  }, []);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Medical Health Care</Text>
@@ -29,42 +41,42 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     paddingHorizontal: 20,
-    backgroundColor: "#f8f9fa", // Light background color for a soft tone
+    backgroundColor: "#f8f9fa",
   },
   title: {
     fontSize: 48,
-    color: "#1E3A8A", // Dark blue for a professional feel
+    color: "#1E3A8A",
     fontFamily: "Georgia",
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 30, // Adds spacing between title and image
+    marginBottom: 30,
   },
   imageContainer: {
     width: "100%",
-    height: "50%", // Adjusts the image height to make it more proportional
+    height: "50%",
     marginBottom: 30,
-    overflow: "hidden", // Ensures image doesn't overflow
-    borderRadius: 15, // Smooth rounded corners
+    overflow: "hidden",
+    borderRadius: 15,
   },
   image: {
     width: "100%",
     height: "100%",
-    borderRadius: 15, // Ensures the image itself has rounded corners
+    borderRadius: 15,
   },
   button: {
     fontSize: 18,
     color: "#ffffff",
-    backgroundColor: "#3b82f6", // Bright blue background for the button
+    backgroundColor: "#3b82f6",
     paddingVertical: 15,
     paddingHorizontal: 30,
-    borderRadius: 25, // Rounded corners for the button
+    borderRadius: 25,
     textAlign: "center",
     fontWeight: "bold",
-    textDecorationLine: "none", // Removed underline for a cleaner look
-    shadowColor: "#000", // Adding shadow for 3D effect
+    textDecorationLine: "none",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 5, // Shadow for Android
+    elevation: 5,
   },
 });

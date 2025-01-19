@@ -57,7 +57,7 @@ Simulation.add = async (newData) => {
       newData.temperature,
       newData.heart_rate,
       newData.pression,
-    ]);
+    ]); 
 
     return result;
   } catch (error) {
@@ -86,7 +86,9 @@ Simulation.addUser = async (newData) => {
 
 Simulation.getAllUsers = async () => {
   try {
-    const result = await dbConn.query("SELECT * FROM users INNER JOIN appareils ON users.u_id = appareils.u_id ORDER BY users.u_id DESC");
+    const result = await dbConn.query(
+      "SELECT * FROM users INNER JOIN appareils ON users.u_id = appareils.u_id ORDER BY users.u_id DESC"
+    );
 
     return result.rows;
   } catch (error) {
@@ -147,7 +149,6 @@ Simulation.getStatValue = async (values) => {
         AND created_at < $2::DATE + INTERVAL '1 day'`,
       [values.id, values.date]
     );
-    console.log("STAT ", result.rows);
 
     return result.rows;
   } catch (error) {

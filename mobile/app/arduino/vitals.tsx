@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import * as Notifications from "expo-notifications";
 import {
   View,
   Text,
@@ -26,7 +27,7 @@ interface User {
   date_naiss: string;
   email: string;
   sexe: string;
-  coms: string;
+  sante: string;
 }
 
 export default function VitalsArduino() {
@@ -42,73 +43,150 @@ export default function VitalsArduino() {
         date_naiss: "Inconnue",
         email: "Inconnu",
         sexe: "Inconnu",
-        coms: "aucune information disponible",
+        sante: "Inconnu",
       };
 
   const [temperature, setTemperature] = useState(35.5);
-  const [heartRate, setHeartRate] = useState(58);
-  const [spo2, setSpo2] = useState(88);
-  const [intensity, setIntensity] = useState(0);
   const [heartRateData, setHeartRateData] = useState<number[]>([]);
+  const [lastTemperature, setLastTemperature] = useState(35.5);
+
+  const [heartRate, setHeartRate] = useState(58);
   const [temperatureData, setTemperatureData] = useState<number[]>([]);
+  const [lastHeartRate, setLastHeartRate] = useState(58);
+
+  const [spo2, setSpo2] = useState(88);
   const [spo2Data, setSpo2Data] = useState<number[]>([]);
+  const [lastSpo2, setLastSpo2] = useState(88);
+
   const [isStat, setIsStat] = useState(true);
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+
+  useEffect(() => {
+    const vitalsDBdata = () => {
+      axios
+        .get(
+          `http://192.168.1.10:5111/api/simulation/vitals/${
+            parsedUser.u_id
+          }?date=${new Date().toISOString().split("T")[0]}`
+        )
+        .then((response) => {
+          console.log("1rst time Data fetch successfully");
+          if (response.data.length > 0) {
+            const first10Data = response.data.slice(0, 10);
+
+            type VitalData = {
+              temperature: number;
+              heart_rate: number;
+              pression: number;
+            };
+
+            const temperatureValues = first10Data.map(
+              (item: VitalData) => item.temperature
+            );
+            const heartRateValues = first10Data.map(
+              (item: VitalData) => item.heart_rate
+            );
+            const spo2Values = first10Data.map(
+              (item: VitalData) => item.pression
+            );
+
+            setTemperatureData(temperatureValues);
+            setHeartRateData(heartRateValues);
+            setSpo2Data(spo2Values);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    };
+    vitalsDBdata();
+  }, []);
 
   useEffect(() => {
     const simulateVitals = () => {
-      const multiplier = 1 + intensity / 100;
-
-      if (intensity <= 30) {
-        const newTemperature =
-          temperature + (Math.random() * 0.2 - 0.1) * multiplier;
-        setTemperature(newTemperature);
-
-        const variationH = (Math.random() * 4 - 2) * multiplier;
-        const newHeartRate = Math.min(
-          120,
-          Math.max(45, heartRate + variationH)
-        );
-        setHeartRate(parseFloat(newHeartRate.toFixed(2)));
-
-        const variation = (Math.random() * 2 - 1) * multiplier;
-        const newSpo2 = Math.min(120, Math.max(75, spo2 + variation));
-        setSpo2(parseFloat(newSpo2.toFixed(2)));
-      } else {
-        const newTemperature = Math.min(42, temperature + 0.1 * multiplier);
-        setTemperature(newTemperature);
-
-        const newHeartRate = Math.min(120, heartRate + 1 * multiplier);
-        setHeartRate(parseFloat(newHeartRate.toFixed(2)));
-
-        const newSpo2 = Math.min(120, spo2 + 0.5 * multiplier);
-        setSpo2(parseFloat(newSpo2.toFixed(2)));
-      }
-
-      const vitalsData = {
-        u_id: 2,
-        c: temperature.toFixed(1),
-        bpm: Math.round(heartRate),
-        spo2: Math.round(spo2),
-      };
-
       axios
-        .post("http://192.168.1.10:5111/api/simulation/", vitalsData)
-        .then(() => {
-          console.log("Data sent successfully");
+        .get(
+          `http://192.168.1.10:5111/api/simulation/vitals/${
+            parsedUser.u_id
+          }?date=${new Date().toISOString().split("T")[0]}`
+        )
+        .then((response) => {
+          console.log("Data fetch successfully");
+          const newTemperature = response.data[0].temperature;
+          const newHeartRate = response.data[0].heart_rate;
+          const newSpo2 = response.data[0].pression;
+
+          if (
+            newTemperature !== lastTemperature ||
+            newHeartRate !== lastHeartRate ||
+            newSpo2 !== lastSpo2
+          ) {
+            setTemperature(newTemperature);
+            setLastTemperature(newTemperature);
+            setTemperatureData((prevData) =>
+              [...prevData, newTemperature].slice(-10)
+            );
+
+            setHeartRate(newHeartRate);
+            setLastHeartRate(newHeartRate);
+            setHeartRateData((prevData) =>
+              [...prevData, newHeartRate].slice(-10)
+            );
+
+            setSpo2(newSpo2);
+            setLastSpo2(newSpo2);
+            setSpo2Data((prevData) => [...prevData, newSpo2].slice(-10));
+
+            if (newTemperature > 59) {
+              Notifications.scheduleNotificationAsync({
+                content: {
+                  title: "⚠️ Température élevée !",
+                  body: `Température détectée : ${newTemperature.toFixed(1)}°C`,
+                  sound: "default",
+                },
+                trigger: null,
+              });
+            }
+
+            if (newHeartRate > 295) {
+              Notifications.scheduleNotificationAsync({
+                content: {
+                  title: "⚠️ Fréquence cardiaque élevée !",
+                  body: `Fréquence détectée : ${newHeartRate} bpm`,
+                  sound: "default",
+                },
+                trigger: null,
+              });
+            }
+
+            if (newSpo2 > 201) {
+              Notifications.scheduleNotificationAsync({
+                content: {
+                  title: "⚠️ Niveau de SpO2 élevé !",
+                  body: `SpO2 détecté : ${newSpo2}%`,
+                  sound: "default",
+                },
+                trigger: null,
+              });
+            }
+          }
         })
         .catch((error) => {
-          console.error("Error sending data:", error);
+          console.error("Error fetching data:", error);
         });
-
-      setHeartRateData((prevData) => [...prevData, heartRate].slice(-10));
-      setTemperatureData((prevData) => [...prevData, temperature].slice(-10));
-      setSpo2Data((prevData) => [...prevData, spo2].slice(-10));
     };
 
     const interval = setInterval(simulateVitals, 2000);
 
     return () => clearInterval(interval);
-  }, [temperature, heartRate, spo2, intensity]);
+  }, [lastTemperature, lastHeartRate, lastSpo2]);
 
   const showToStats = () => {
     setIsStat(!isStat);
@@ -133,17 +211,17 @@ export default function VitalsArduino() {
 
       <View style={styles.sliderAndButtonContainer}>
         <View style={styles.sliderContainer}>
-          <Text style={styles.bbold}>Simulation d'Exercice: {intensity}%</Text>
+          <Text style={styles.bbold}>Simulation d'Exercice: 1%</Text>
           <Slider
             style={styles.slider}
             minimumValue={0}
             maximumValue={100}
             step={1}
-            value={intensity}
-            onValueChange={setIntensity}
+            value={1}
             minimumTrackTintColor="#1EB1FC"
             maximumTrackTintColor="#D3D3D3"
             thumbTintColor="#1EB1FC"
+            disabled={true}
           />
         </View>
         <TouchableOpacity
@@ -180,7 +258,7 @@ export default function VitalsArduino() {
                         ? `rgba(0, 0, 255, ${opacity})`
                         : temperature > 39
                         ? `rgba(255, 0, 0, ${opacity})`
-                        : `rgba(255, 165, 0, ${opacity})`,  
+                        : `rgba(255, 165, 0, ${opacity})`,
                   },
                 ],
               }}
@@ -206,10 +284,17 @@ export default function VitalsArduino() {
             <LineChart
               style={styles.chartGraphe}
               data={{
-                labels: new Array(heartRateData.length).fill(""),
+                labels:
+                  heartRateData.length > 0
+                    ? new Array(heartRateData.length).fill("")
+                    : [],
                 datasets: [
                   {
-                    data: heartRateData,
+                    data: heartRateData.length > 0 ? heartRateData : [0],
+                    color: (opacity = 1) =>
+                      heartRate < 81
+                        ? `rgba(0, 255, 0, ${opacity})`
+                        : `rgba(255, 0, 0, ${opacity})`,
                   },
                 ],
               }}
@@ -220,7 +305,10 @@ export default function VitalsArduino() {
                 backgroundGradientFrom: "#bcbcbc",
                 backgroundGradientTo: "#bcbcbc",
                 decimalPlaces: 2,
-                color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
+                color: (opacity = 1) =>
+                  heartRate < 81
+                    ? `rgba(0, 255, 0, ${opacity})`
+                    : `rgba(255, 0, 0, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
               }}
               bezier
@@ -277,7 +365,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#2c3e50",  
+    color: "#2c3e50",
     marginBottom: 10,
     paddingLeft: 20,
   },

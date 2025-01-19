@@ -15,7 +15,7 @@ export default function RootLayout() {
           headerTitle: "Apropos",
         }}
       />
-      
+
       <Stack.Screen
         name="ios/vitals"
         options={{
@@ -25,13 +25,27 @@ export default function RootLayout() {
       <Stack.Screen
         name="ios/dashboard"
         options={{
-          headerTitle: "Dashboard",
+          headerTitle: "Fiches",
         }}
       />
+
+      <Stack.Screen
+        name="arduino/vitals"
+        options={{
+          headerTitle: "Vitals",
+        }}
+      />
+
       <Stack.Screen
         name="components/stats"
         options={{
           headerTitle: "Stats",
+        }}
+      />
+      <Stack.Screen
+        name="components/addUser"
+        options={{
+          headerTitle: "Nouveau",
         }}
       />
     </Stack>

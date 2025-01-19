@@ -1,3 +1,5 @@
+// Ce code contient une version de notification avec TOAST de react Native
+
 import React, { useState, useEffect } from "react";
 import * as Notifications from "expo-notifications";
 import {
@@ -16,6 +18,7 @@ import axios from "axios";
 import Info from "../components/info";
 import Stat from "../components/stats";
 import { useLocalSearchParams } from "expo-router";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -29,6 +32,45 @@ interface User {
   sexe: string;
   sante: string;
 }
+
+const toastConfig = {
+  success: (props) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: "green",
+        backgroundColor: "#f0f0f0",
+      }}
+      text1Style={{
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#333",
+      }}
+      text2Style={{
+        fontSize: 16,
+        color: "#666",
+      }}
+    />
+  ),
+  error: (props) => (
+    <ErrorToast
+      {...props}
+      style={{
+        borderLeftColor: "red",
+        backgroundColor: "#fff",
+      }}
+      text1Style={{
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#333",
+      }}
+      text2Style={{
+        fontSize: 16,
+        color: "#666",
+      }}
+    />
+  ),
+};
 
 export default function Vitals() {
   const { user } = useLocalSearchParams();
@@ -54,6 +96,29 @@ export default function Vitals() {
   const [temperatureData, setTemperatureData] = useState<number[]>([]);
   const [spo2Data, setSpo2Data] = useState<number[]>([]);
   const [isStat, setIsStat] = useState(true);
+  let notificationQueue: string[] = [];
+  const processNotifications = () => {
+    if (notificationQueue.length > 0) {
+      const nextNotification = notificationQueue.shift();
+      if (nextNotification) {
+        Toast.show({
+          type: "error",
+          text1: "⚠️ Alerte",
+          text2: nextNotification,
+          position: "top",
+          visibilityTime: 3000,
+          onHide: processNotifications,
+        });
+      }
+    }
+  };
+
+  const addToQueue = (message: string) => {
+    notificationQueue.push(message);
+    if (notificationQueue.length === 1) {
+      processNotifications();
+    }
+  };
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -64,75 +129,37 @@ export default function Vitals() {
   });
 
   useEffect(() => {
-    const vitalsDBdata = () => {
-      axios
-        .get(
-          `http://192.168.1.10:5111/api/simulation/vitals/${
-            parsedUser.u_id
-          }?date=${new Date().toISOString().split("T")[0]}`
-        )
-        .then((response) => {
-          console.log(
-            "1rst time Data fetch successfully",
-            response.data.slice(0, 10)
-          );
-          if (response.data.length > 0) {
-            const first10Data = response.data.slice(0, 10);
-
-            type VitalData = {
-              temperature: number;
-              heart_rate: number;
-              pression: number;
-            };
-
-            const temperatureValues = first10Data.map(
-              (item: VitalData) => item.temperature
-            );
-            const heartRateValues = first10Data.map(
-              (item: VitalData) => item.heart_rate
-            );
-            const spo2Values = first10Data.map(
-              (item: VitalData) => item.pression
-            );
-
-            setTemperatureData(temperatureValues);
-            setHeartRateData(heartRateValues);
-            setSpo2Data(spo2Values);
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
-    };
-    vitalsDBdata();
-  }, []);
-
-  useEffect(() => {
     const simulateVitals = () => {
       const multiplier = 1 + intensity / 100;
-      let newTemperature;
-      let newHeartRate;
-      let newSpo2;
 
       if (intensity <= 30) {
-        newTemperature = temperature + (Math.random() * 0.2 - 0.1) * multiplier;
+        const newTemperature =
+          temperature + (Math.random() * 0.2 - 0.1) * multiplier;
+        setTemperature(newTemperature);
 
         const variationH = (Math.random() * 4 - 2) * multiplier;
-        newHeartRate = Math.min(120, Math.max(45, heartRate + variationH));
+        const newHeartRate = Math.min(
+          120,
+          Math.max(45, heartRate + variationH)
+        );
+        setHeartRate(parseFloat(newHeartRate.toFixed(2)));
 
         const variation = (Math.random() * 2 - 1) * multiplier;
-        newSpo2 = Math.min(120, Math.max(75, spo2 + variation));
+        const newSpo2 = Math.min(120, Math.max(75, spo2 + variation));
+        setSpo2(parseFloat(newSpo2.toFixed(2)));
       } else {
-        newTemperature = Math.min(42, temperature + 0.1 * multiplier);
-        newHeartRate = Math.min(120, heartRate + 1 * multiplier);
-        newSpo2 = Math.min(120, spo2 + 0.5 * multiplier);
+        const newTemperature = Math.min(42, temperature + 0.1 * multiplier);
+        setTemperature(newTemperature);
+
+        const newHeartRate = Math.min(120, heartRate + 1 * multiplier);
+        setHeartRate(parseFloat(newHeartRate.toFixed(2)));
+
+        const newSpo2 = Math.min(120, spo2 + 0.5 * multiplier);
+        setSpo2(parseFloat(newSpo2.toFixed(2)));
       }
 
-      setTemperature(newTemperature);
-      setHeartRate(parseFloat(newHeartRate.toFixed(2)));
-      setSpo2(parseFloat(newSpo2.toFixed(2)));
-
-      if (newTemperature > 39) {
+      if (temperature > 36) {
+        addToQueue("Température élevée détectée (> 39°C) !");
         Notifications.scheduleNotificationAsync({
           content: {
             title: "⚠️ Température élevée !",
@@ -142,7 +169,8 @@ export default function Vitals() {
           trigger: null,
         });
       }
-      if (newHeartRate > 75) {
+      if (heartRate > 60) {
+        addToQueue("Fréquence cardiaque élevée détectée (> 81 bpm) !");
         Notifications.scheduleNotificationAsync({
           content: {
             title: "⚠️ Fréquence cardiaque élevée !",
@@ -152,7 +180,8 @@ export default function Vitals() {
           trigger: null,
         });
       }
-      if (newSpo2 > 101) {
+      if (spo2 > 88) {
+        addToQueue("Niveau de SpO2 élevé détecté (> 105%) !");
         Notifications.scheduleNotificationAsync({
           content: {
             title: "⚠️ Niveau de SpO2 élevé !",
@@ -196,6 +225,7 @@ export default function Vitals() {
   return (
     <View style={styles.container}>
       <Info user={parsedUser} />
+      <Toast config={toastConfig} />
 
       <View style={styles.table}>
         <View style={styles.tableRow}>
