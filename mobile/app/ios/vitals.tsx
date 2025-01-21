@@ -120,10 +120,10 @@ export default function Vitals() {
 
       if (intensity <= 30) {
         const variationT = (Math.random() * 0.2 - 0.1) * multiplier;
-        newTemperature = Math.min(42, Math.max(35, temperature + variationT));
+        newTemperature = Math.min(39, Math.max(35, temperature + variationT));
 
         const variationH = (Math.random() * 4 - 2) * multiplier;
-        newHeartRate = Math.min(125, Math.max(45, heartRate + variationH));
+        newHeartRate = Math.min(120, Math.max(45, heartRate + variationH));
 
         const variation = (Math.random() * 2 - 1) * multiplier;
         newSpo2 = Math.min(100, Math.max(88, spo2 + variation));
