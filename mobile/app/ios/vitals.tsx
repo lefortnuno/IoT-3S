@@ -115,17 +115,18 @@ export default function Vitals() {
       let newSpo2;
 
       if (intensity <= 30) {
-        newTemperature = temperature + (Math.random() * 0.2 - 0.1) * multiplier;
+        const variationT = (Math.random() * 0.2 - 0.1) * multiplier;
+        newTemperature = Math.min(42, Math.max(35, temperature + variationT));
 
         const variationH = (Math.random() * 4 - 2) * multiplier;
         newHeartRate = Math.min(125, Math.max(45, heartRate + variationH));
 
         const variation = (Math.random() * 2 - 1) * multiplier;
-        newSpo2 = Math.min(105, Math.max(85, spo2 + variation));
+        newSpo2 = Math.min(100, Math.max(88, spo2 + variation));
       } else {
-        newTemperature = Math.min(42, temperature + 0.1 * multiplier);
-        newHeartRate = Math.min(125, heartRate + 1 * multiplier);
-        newSpo2 = Math.min(105, spo2 + 0.5 * multiplier);
+        newTemperature = Math.min(42, temperature + 0.17 * multiplier);
+        newHeartRate = Math.min(125, heartRate + 1.8 * multiplier);
+        newSpo2 = Math.min(100, spo2 - 0.18 * multiplier);
       }
 
       setTemperature(newTemperature);
@@ -199,9 +200,9 @@ export default function Vitals() {
 
       <View style={styles.table}>
         <View style={styles.tableRow}>
-          <Text style={styles.tableHeader}>Temperature</Text>
+          <Text style={styles.tableHeader}>Température</Text>
           <Text style={styles.tableHeader}>Heart Rate</Text>
-          <Text style={styles.tableHeader}>SpO2</Text>
+          <Text style={styles.tableHeader}>Taux d'Oxygène</Text>
         </View>
         <View style={styles.tableRow}>
           <Text style={styles.tableCell}>{temperature.toFixed(1)}°C</Text>
@@ -255,7 +256,7 @@ export default function Vitals() {
                   {
                     data: temperatureData,
                     color: (opacity = 1) =>
-                      temperature < 37
+                      temperature < 37.2
                         ? `rgba(0, 0, 255, ${opacity})`
                         : temperature > 39.5
                         ? `rgba(255, 0, 0, ${opacity})`
@@ -271,7 +272,7 @@ export default function Vitals() {
                 backgroundGradientTo: "#bcbcbc",
                 decimalPlaces: 1,
                 color: (opacity = 1) =>
-                  temperature < 37
+                  temperature < 37.2
                     ? `rgba(0, 0, 255, ${opacity})`
                     : temperature > 39.5
                     ? `rgba(255, 0, 0, ${opacity})`
@@ -316,7 +317,7 @@ export default function Vitals() {
             />
 
             {/* Title for SpO2 Chart */}
-            <Text style={styles.chartTitle}>SpO2</Text>
+            <Text style={styles.chartTitle}>Taux d'Oxygène</Text>
             <PieChart
               data={[
                 {
@@ -329,7 +330,7 @@ export default function Vitals() {
                 },
                 {
                   name: "Rest",
-                  population: parseFloat((105 - spo2).toFixed(2)),
+                  population: parseFloat((100 - spo2).toFixed(2)),
                   color: "rgba(192, 192, 192, 1)",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 15,

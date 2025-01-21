@@ -198,9 +198,9 @@ export default function VitalsArduino() {
 
       <View style={styles.table}>
         <View style={styles.tableRow}>
-          <Text style={styles.tableHeader}>Temperature</Text>
-          <Text style={styles.tableHeader}>Heart Rate</Text>
-          <Text style={styles.tableHeader}>SpO2</Text>
+                  <Text style={styles.tableHeader}>Température</Text>
+                  <Text style={styles.tableHeader}>Heart Rate</Text>
+                  <Text style={styles.tableHeader}>Taux d'Oxygène</Text>
         </View>
         <View style={styles.tableRow}>
           <Text style={styles.tableCell}>{temperature.toFixed(1)}°C</Text>
@@ -254,7 +254,7 @@ export default function VitalsArduino() {
                   {
                     data: temperatureData,
                     color: (opacity = 1) =>
-                      temperature < 37
+                      temperature < 37.2
                         ? `rgba(0, 0, 255, ${opacity})`
                         : temperature > 39.5
                         ? `rgba(255, 0, 0, ${opacity})`
@@ -270,7 +270,7 @@ export default function VitalsArduino() {
                 backgroundGradientTo: "#bcbcbc",
                 decimalPlaces: 1,
                 color: (opacity = 1) =>
-                  temperature < 37
+                  temperature < 37.2
                     ? `rgba(0, 0, 255, ${opacity})`
                     : temperature > 39.5
                     ? `rgba(255, 0, 0, ${opacity})`
@@ -315,7 +315,7 @@ export default function VitalsArduino() {
             />
 
             {/* Title for SpO2 Chart */}
-            <Text style={styles.chartTitle}>SpO2</Text>
+            <Text style={styles.chartTitle}>Taux d'Oxygène</Text>
             <PieChart
               data={[
                 {
@@ -328,7 +328,7 @@ export default function VitalsArduino() {
                 },
                 {
                   name: "Rest",
-                  population: parseFloat((105 - spo2).toFixed(2)),
+                  population: parseFloat((100 - spo2).toFixed(2)),
                   color: "rgba(192, 192, 192, 1)",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 15,

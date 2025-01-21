@@ -150,7 +150,7 @@ const Stat: React.FC<Props> = ({ u_id }) => {
             ]}
           />
           <StatChart
-            title="Heart Rate"
+            title="Fréquence Cardiaque"
             labels={["Max", "Min", "Moyenne"]}
             todayData={[statToday.max_h, statToday.min_h, statToday.avg_h]}
             yesterdayData={[
@@ -160,7 +160,7 @@ const Stat: React.FC<Props> = ({ u_id }) => {
             ]}
           />
           <StatChart
-            title="SpO2"
+            title="Taux d'Oxygène"
             labels={["Max", "Min", "Moyenne"]}
             todayData={[statToday.max_p, statToday.min_p, statToday.avg_p]}
             yesterdayData={[
@@ -192,7 +192,7 @@ const Stat: React.FC<Props> = ({ u_id }) => {
               <Text style={styles.tableCell}>{statToday.avg_h.toFixed(2)}</Text>
             </View>
             <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>SpO2 (%)</Text>
+              <Text style={styles.tableCell}>Taux d'Oxygène (%)</Text>
               <Text style={styles.tableCell}>
                 {statYesterday.avg_p.toFixed(2)}
               </Text>

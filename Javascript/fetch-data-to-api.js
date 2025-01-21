@@ -5,9 +5,9 @@ function getLatestValue() {
     ".code_panel__serial__content__text"
   );
   if (serialContent) {
-    const lines = serialContent.innerText.trim().split("\n"); // Diviser par lignes
-    const lastValue = lines[lines.length - 1]; // Dernière ligne
-    return lastValue && lastValue.trim() ? lastValue : null; // Si la ligne est vide ou invalide, renvoyer null
+    const lines = serialContent.innerText.trim().split("\n");
+    const lastValue = lines[lines.length - 1];
+    return lastValue && lastValue.trim() ? lastValue : null;
   }
   return null;
 }
@@ -22,7 +22,6 @@ function sendDataToServer(value) {
     return;
   }
 
-  // Comparer la valeur actuelle avec celle envoyée précédemment
   const currentData = `${c},${bpm},${spo2}`;
   if (lastSentData === currentData) {
     return;
@@ -38,8 +37,6 @@ function sendDataToServer(value) {
     spo2: spo2,
   };
 
-  console.log("Données Envoyées: ", JSON.stringify(data));
-
   fetch("https://iot-3s.onrender.com/api/simulation/", {
     method: "POST",
     headers: {
@@ -48,8 +45,12 @@ function sendDataToServer(value) {
     body: JSON.stringify(data),
   })
     .then((response) => response.json())
-    .then((data) => console.log("Succeed!"))
-    .catch((error) => console.error("Erreur:", error));
+    .then(() => {
+      console.log("Data Send Succeed! ", JSON.stringify(data));
+    })
+    .catch((error) => {
+      console.error("Erreur:", error);
+    });
 }
 
 setInterval(() => {

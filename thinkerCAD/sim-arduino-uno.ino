@@ -1,5 +1,4 @@
-// SIMULATION AVANCER 
-
+// ADvanced Simulation   
 float lastTemperature = 36.5;   
 int lastHeartRate = 75;         
 int lastSpO2 = 98;              
@@ -24,7 +23,7 @@ void loop() {
   if (lastSpO2 < 95) lastSpO2 = 95;
   if (lastSpO2 > 100) lastSpO2 = 100;
  
-  Serial.print(lastTemperature, 2); //2chiffres apres virgule   
+  Serial.print(lastTemperature, 2);  
   Serial.print(",");
   Serial.print(lastHeartRate);  
   Serial.print(",");

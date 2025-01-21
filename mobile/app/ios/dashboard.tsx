@@ -73,7 +73,7 @@ const Dashboard = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Liste des Utilisateurs</Text>
+      <Text style={styles.title}>Registre des patients</Text>
 
       {/* Bouton Ajouter un utilisateur */}
       <TouchableOpacity style={styles.addButton} onPress={navigateToAddUser}>
@@ -116,6 +116,14 @@ const Dashboard = () => {
           </View>
         )}
       />
+
+      <View style={styles.imageContainer}>
+        <Image
+          style={styles.image}
+          resizeMode="contain"
+          source={require("../../assets/images/medecine.jpg")}
+        />
+      </View>
     </View>
   );
 };
@@ -195,6 +203,18 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginLeft: 10,
+  },
+  imageContainer: {
+    width: "100%",
+    height: "40%",
+    marginBottom: 10,
+    overflow: "hidden",
+    borderRadius: 8,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 8,
   },
 });
 
