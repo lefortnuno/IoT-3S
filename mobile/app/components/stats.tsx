@@ -12,21 +12,27 @@ import {
 
 const screenWidth = Dimensions.get("window").width;
 
+// const BASE_URL_LOCAL = "http://192.168.1.10:5111/api/simulation/";
+const BASE_URL = "https://iot-3s.onrender.com/api/simulation/";
+
 interface Stat {
-  max_t: number;
-  max_h: number;
-  max_p: number;
-  min_t: number;
-  min_h: number;
-  min_p: number;
-  avg_t: number;
-  avg_h: number;
-  avg_p: number;
+  max_t: number | null;
+  max_h: number | null;
+  max_p: number | null;
+  min_t: number | null;
+  min_h: number | null;
+  min_p: number | null;
+  avg_t: number | null;
+  avg_h: number | null;
+  avg_p: number | null;
 }
 
 interface Props {
   u_id: number;
 }
+
+const safeValue = (value: number | null | undefined, decimals = 2): string =>
+  value !== null && value !== undefined ? value.toFixed(decimals) : "N/A";
 
 const StatChart: React.FC<{
   title: string;
@@ -88,12 +94,8 @@ const Stat: React.FC<Props> = ({ u_id }) => {
       const today = formatDate(new Date());
       const yesterday = formatDate(new Date(Date.now() - 86400000));
       const [todayRes, yesterdayRes] = await Promise.all([
-        axios.get<Stat[]>(
-          `http://192.168.1.10:5111/api/simulation/stat/${u_id}?date=${today}`
-        ),
-        axios.get<Stat[]>(
-          `http://192.168.1.10:5111/api/simulation/stat/${u_id}?date=${yesterday}`
-        ),
+        axios.get<Stat[]>(BASE_URL + `stat/${u_id}?date=${today}`),
+        axios.get<Stat[]>(BASE_URL + `stat/${u_id}?date=${yesterday}`),
       ]);
 
       setStatToday(todayRes.data[0] || null);
@@ -142,31 +144,43 @@ const Stat: React.FC<Props> = ({ u_id }) => {
           <StatChart
             title="Température"
             labels={["Max", "Min", "Moyenne"]}
-            todayData={[statToday.max_t, statToday.min_t, statToday.avg_t]}
+            todayData={[
+              statToday?.max_t ?? 0,
+              statToday?.min_t ?? 0,
+              statToday?.avg_t ?? 0,
+            ]}
             yesterdayData={[
-              statYesterday.max_t,
-              statYesterday.min_t,
-              statYesterday.avg_t,
+              statYesterday?.max_t ?? 0,
+              statYesterday?.min_t ?? 0,
+              statYesterday?.avg_t ?? 0,
             ]}
           />
           <StatChart
             title="Fréquence Cardiaque"
             labels={["Max", "Min", "Moyenne"]}
-            todayData={[statToday.max_h, statToday.min_h, statToday.avg_h]}
+            todayData={[
+              statToday?.max_h ?? 0,
+              statToday?.min_h ?? 0,
+              statToday?.avg_h ?? 0,
+            ]}
             yesterdayData={[
-              statYesterday.max_h,
-              statYesterday.min_h,
-              statYesterday.avg_h,
+              statYesterday?.max_h ?? 0,
+              statYesterday?.min_h ?? 0,
+              statYesterday?.avg_h ?? 0,
             ]}
           />
           <StatChart
             title="Taux d'Oxygène"
             labels={["Max", "Min", "Moyenne"]}
-            todayData={[statToday.max_p, statToday.min_p, statToday.avg_p]}
+            todayData={[
+              statToday?.max_p ?? 0,
+              statToday?.min_p ?? 0,
+              statToday?.avg_p ?? 0,
+            ]}
             yesterdayData={[
-              statYesterday.max_p,
-              statYesterday.min_p,
-              statYesterday.avg_p,
+              statYesterday?.max_p ?? 0,
+              statYesterday?.min_p ?? 0,
+              statYesterday?.avg_p ?? 0,
             ]}
           />
 
@@ -180,23 +194,29 @@ const Stat: React.FC<Props> = ({ u_id }) => {
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>Température (°C)</Text>
               <Text style={styles.tableCell}>
-                {statYesterday.avg_t.toFixed(2)}
+                {safeValue(statYesterday?.avg_t)}
               </Text>
-              <Text style={styles.tableCell}>{statToday.avg_t.toFixed(2)}</Text>
+              <Text style={styles.tableCell}>
+                {safeValue(statToday?.avg_t)}
+              </Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>Heart Rate (BPM)</Text>
               <Text style={styles.tableCell}>
-                {statYesterday.avg_h.toFixed(2)}
+                {safeValue(statYesterday?.avg_h)}
               </Text>
-              <Text style={styles.tableCell}>{statToday.avg_h.toFixed(2)}</Text>
+              <Text style={styles.tableCell}>
+                {safeValue(statToday?.avg_h)}
+              </Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>Taux d'Oxygène (%)</Text>
               <Text style={styles.tableCell}>
-                {statYesterday.avg_p.toFixed(2)}
+                {safeValue(statYesterday?.avg_p)}
               </Text>
-              <Text style={styles.tableCell}>{statToday.avg_p.toFixed(2)}</Text>
+              <Text style={styles.tableCell}>
+                {safeValue(statToday?.avg_p)}
+              </Text>
             </View>
           </View>
         </ScrollView>
@@ -208,10 +228,7 @@ const Stat: React.FC<Props> = ({ u_id }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
+  container: { flex: 1, backgroundColor: "#f5f5f5" },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -232,16 +249,8 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 10,
   },
-  loadingText: {
-    textAlign: "center",
-    marginTop: 10,
-    color: "#555",
-  },
-  errorText: {
-    color: "red",
-    textAlign: "center",
-    marginTop: 20,
-  },
+  loadingText: { textAlign: "center", marginTop: 10, color: "#555" },
+  errorText: { color: "red", textAlign: "center", marginTop: 20 },
   tableContainer: {
     marginTop: 20,
     padding: 15,
@@ -264,23 +273,10 @@ const styles = StyleSheet.create({
     color: "#333",
     flex: 1,
   },
-  tableCell: {
-    fontSize: 16,
-    textAlign: "center",
-    color: "#555",
-    flex: 1,
-  },
-  noDataText: {
-    textAlign: "center",
-    color: "#888",
-    marginTop: 20,
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 20,
-  },
+  tableCell: { fontSize: 16, textAlign: "center", color: "#555", flex: 1 },
+  noDataText: { textAlign: "center", color: "#888", marginTop: 20 },
+  scrollContainer: { flex: 1 },
+  scrollContent: { paddingBottom: 20 },
 });
 
 export default Stat;

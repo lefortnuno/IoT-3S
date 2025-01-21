@@ -11,13 +11,16 @@ import {
 import { LineChart, BarChart, PieChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import Slider from "@react-native-community/slider";
-import axios from "axios";
+import axios from "axios"; 
 
 import Info from "../components/info";
 import Stat from "../components/stats";
 import { useLocalSearchParams } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
+
+// const BASE_URL_LOCAL = "http://192.168.1.10:5111/api/simulation/";
+const BASE_URL = "https://iot-3s.onrender.com/api/simulation/"
 
 interface User {
   u_id: number;
@@ -67,9 +70,10 @@ export default function Vitals() {
     const vitalsDBdata = () => {
       axios
         .get(
-          `http://192.168.1.10:5111/api/simulation/vitals/${
-            parsedUser.u_id
-          }?date=${new Date().toISOString().split("T")[0]}`
+          BASE_URL +
+            `vitals/${parsedUser.u_id}?date=${
+              new Date().toISOString().split("T")[0]
+            }`
         )
         .then((response) => {
           console.log(
@@ -172,7 +176,7 @@ export default function Vitals() {
       };
 
       axios
-        .post("http://192.168.1.10:5111/api/simulation/", vitalsData)
+        .post(BASE_URL, vitalsData)
         .then(() => {
           console.log("Data sent successfully");
         })

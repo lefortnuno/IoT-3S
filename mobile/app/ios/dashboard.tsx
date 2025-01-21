@@ -10,6 +10,9 @@ import {
 import { useRouter } from "expo-router";
 import axios from "axios";
 
+// const BASE_URL_LOCAL = "http://192.168.1.10:5111/api/simulation/";
+const BASE_URL = "https://iot-3s.onrender.com/api/simulation/";
+
 interface User {
   u_id: number;
   nom: string;
@@ -25,9 +28,7 @@ const Dashboard = () => {
 
   const getUsers = async () => {
     try {
-      const response = await axios.get<User[]>(
-        "http://192.168.1.10:5111/api/simulation/"
-      );
+      const response = await axios.get<User[]>(BASE_URL);
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);

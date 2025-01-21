@@ -17,7 +17,10 @@ import Info from "../components/info";
 import Stat from "../components/stats";
 import { useLocalSearchParams } from "expo-router";
 
-const screenWidth = Dimensions.get("window").width;
+const screenWidth = Dimensions.get("window").width; 
+
+// const BASE_URL_LOCAL = "http://192.168.1.10:5111/api/simulation/";
+const BASE_URL = "https://iot-3s.onrender.com/api/simulation/";
 
 interface User {
   u_id: number;
@@ -72,9 +75,10 @@ export default function VitalsArduino() {
     const vitalsDBdata = () => {
       axios
         .get(
-          `http://192.168.1.10:5111/api/simulation/vitals/${
-            parsedUser.u_id
-          }?date=${new Date().toISOString().split("T")[0]}`
+          BASE_URL +
+            `vitals/${parsedUser.u_id}?date=${
+              new Date().toISOString().split("T")[0]
+            }`
         )
         .then((response) => {
           console.log("1rst time Data fetch successfully");
@@ -113,9 +117,10 @@ export default function VitalsArduino() {
     const simulateVitals = () => {
       axios
         .get(
-          `http://192.168.1.10:5111/api/simulation/vitals/${
-            parsedUser.u_id
-          }?date=${new Date().toISOString().split("T")[0]}`
+          BASE_URL +
+            `vitals/${parsedUser.u_id}?date=${
+              new Date().toISOString().split("T")[0]
+            }`
         )
         .then((response) => {
           console.log("Data fetch successfully");
@@ -198,9 +203,9 @@ export default function VitalsArduino() {
 
       <View style={styles.table}>
         <View style={styles.tableRow}>
-                  <Text style={styles.tableHeader}>Température</Text>
-                  <Text style={styles.tableHeader}>Heart Rate</Text>
-                  <Text style={styles.tableHeader}>Taux d'Oxygène</Text>
+          <Text style={styles.tableHeader}>Température</Text>
+          <Text style={styles.tableHeader}>Heart Rate</Text>
+          <Text style={styles.tableHeader}>Taux d'Oxygène</Text>
         </View>
         <View style={styles.tableRow}>
           <Text style={styles.tableCell}>{temperature.toFixed(1)}°C</Text>
