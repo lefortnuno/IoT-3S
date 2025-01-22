@@ -1,0 +1,25 @@
+Un pas vers l’avenir de la santé connectée 🚀 IoT et l’e-santé.
+
+Imaginez un monde où un simple clic peut sauver des vies, où les données de santé sont accessibles en temps réel, et où la distance n’est plus un obstacle à des soins de qualité.  
+C’est avec cette vision que j’ai développé le "Système de Surveillance de Santé à Distance" : une solution alliant 'technologie' et 'humanité' pour révolutionner le suivi médical 🏥.  
+
+🔍 Dans les coulisses de la création :  
+- Design intuitif : Une interface pensée pour les patients et les professionnels, rendant l’expérience simple et accessible.  
+- Technologies robustes : MQTT, Mosquitto, Node-RED, PostgreSQL, NodeJs, Python et bien sûr, une application Mobile en React Native et TypeScript.  
+- Prototypage avant-gardiste : Avec ThinkerCAD, et bientôt Apple Watch aussi, chaque détail des capteurs connectés a été pensé pour répondre à des besoins réels. 
+
+🎯 À qui s’adresse cette innovation ?  
+- Aux patients, pour un suivi rassurant et autonome.  
+- Aux professionnels de santé, pour des données fiables et disponibles à tout moment.  
+- Aux aidants, pour leur permettre de mieux accompagner leurs proches.  
+
+📹 Découvrez la magie en action !  
+Je vous invite à regarder la démonstration vidéo de l’application mobile, qui montre comment la technologie peut rapprocher les 'cœurs' ❤ et les 'soins' ❤‍🩹.  
+
+Cette aventure n’est qu’un début ! Je serais ravi de discuter avec vous, partager vos idées ou imaginer des collaborations pour aller encore plus loin ✨.  
+
+🌟 La technologie au service de l’humain 🌟.
+
+#Trofel #IoT #MQTT #Mosquitto #NodeRED #PostgreSQL #NodeJs #Python #ReactNative #TypeScript #Santé #Médical #e-santé
+ 
+ 
