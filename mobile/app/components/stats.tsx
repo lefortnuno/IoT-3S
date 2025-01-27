@@ -88,7 +88,7 @@ const Stat: React.FC<Props> = ({ u_id }) => {
   const formatDate = (date: Date): string => date.toISOString().split("T")[0];
 
   const fetchStats = async () => {
-    setLoading(true);
+    // setLoading(true);
     setError(null);
     try {
       const today = formatDate(new Date());
@@ -110,7 +110,9 @@ const Stat: React.FC<Props> = ({ u_id }) => {
   };
 
   useEffect(() => {
-    fetchStats();
+    const interval = setInterval(fetchStats, 2000);
+
+    return () => clearInterval(interval);
   }, [u_id]);
 
   if (loading) {

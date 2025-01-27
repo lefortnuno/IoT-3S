@@ -98,7 +98,7 @@ Simulation.getAllUsers = async () => {
 
 Simulation.getUser = async (value) => {
   try {
-    const result = await dbConn.query("SELECT * FROM users WHERE u_id = $1", [
+    const result = await dbConn.query("SELECT * FROM users INNER JOIN appareils ON users.u_id = appareils.u_id WHERE users.u_id = $1", [
       value.id,
     ]);
 
