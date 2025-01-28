@@ -19,7 +19,7 @@ import { useLocalSearchParams } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width; 
 
-// const BASE_URL_LOCAL = "http://192.168.1.10:5111/api/simulation/";
+// const BASE_URL = "http://192.168.1.10:5111/api/simulation/";
 const BASE_URL = "https://iot-3s.onrender.com/api/simulation/";
 
 interface User {
@@ -53,13 +53,13 @@ export default function VitalsArduino() {
   const [heartRateData, setHeartRateData] = useState<number[]>([]);
   const [lastTemperature, setLastTemperature] = useState(36.5);
 
-  const [heartRate, setHeartRate] = useState(65);
+  const [heartRate, setHeartRate] = useState(65.1);
   const [temperatureData, setTemperatureData] = useState<number[]>([]);
-  const [lastHeartRate, setLastHeartRate] = useState(65);
+  const [lastHeartRate, setLastHeartRate] = useState(65.1);
 
-  const [spo2, setSpo2] = useState(95);
+  const [spo2, setSpo2] = useState(97.5);
   const [spo2Data, setSpo2Data] = useState<number[]>([]);
-  const [lastSpo2, setLastSpo2] = useState(95);
+  const [lastSpo2, setLastSpo2] = useState(97.5);
 
   const [isStat, setIsStat] = useState(true);
 

@@ -20,8 +20,8 @@ CREATE TABLE simulations (
     id SERIAL PRIMARY KEY,
     u_id INT,
     temperature FLOAT DEFAULT NULL,
-    heart_rate INT DEFAULT NULL,
-    pression INT DEFAULT NULL,
+    heart_rate FLOAT DEFAULT NULL,
+    pression FLOAT DEFAULT NULL,
     coms VARCHAR(150) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_users FOREIGN KEY ("u_id") REFERENCES users(u_id) ON DELETE CASCADE

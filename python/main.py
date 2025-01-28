@@ -3,6 +3,7 @@ import requests
 import time
 import json
 from datetime import datetime, timedelta
+import threading
  
 broker = "localhost"   
 port = 1883
@@ -15,11 +16,14 @@ client = mqtt.Client()
 client.connect(broker, port)
  
 id_user = 1
-id_user_tmp = id_user
-# url = "https://iot-3s.onrender.com/api/simulation/" 
-url = "http://192.168.1.10:5111/api/simulation/" 
- 
-from datetime import datetime
+stop_simulation = threading.Event()
+simulation_thread = None
+
+date_today = datetime.now().strftime("%Y-%m-%d")
+date_yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+
+url = "https://iot-3s.onrender.com/api/simulation/" 
+# url = "http://192.168.1.10:5111/api/simulation/" 
 
 def fetch_and_publish_user(url, api_name, id):
     uri = f"{url}{api_name}{id}"
@@ -60,31 +64,6 @@ def fetch_and_publish_user(url, api_name, id):
 
     except requests.exceptions.RequestException as e:
         print(f"USER Erreur lors de la récupération des données : {e}")
-
-
-# Callback pour gérer les messages reçus
-def on_message(client, userdata, msg):
-    try:
-        payload = msg.payload.decode("utf-8")
-        # print(f"Message reçu sur le topic {msg.topic}: {payload}")
-        
-        # Vérification que le message contient un ID valide
-        id_user = int(payload)
-        if id_user > 0:
-            # print(f"Relancer fetch_and_publish_user avec id_user={id_user}")
-            fetch_and_publish_user(url, "user/", id_user)
-            
-            date_today = datetime.now().strftime("%Y-%m-%d")
-            date_yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-            dataToday = fetch_statistics(url, "stat/", id_user, date_today) 
-            dataYesterday = fetch_statistics(url, "stat/", id_user, date_yesterday) 
-            publish_statistics(dataYesterday, dataToday, topicStat)
-            # fetch_and_publish_simulation(url, "vitals/", id_user)
-
-        else:
-            print(f"ID utilisateur invalide: {id_user}")
-    except ValueError:
-        print(f"Erreur de parsing de l'ID utilisateur: {msg.payload}")
 
 
 def fetch_statistics(url, api_name, id, date):
@@ -154,55 +133,82 @@ def publish_statistics(dataYesterday, dataToday, topicStats):
 def fetch_and_publish_simulation(url, api_name, id):
     uri = f"{url}{api_name}{id}"
     try: 
-        payload = {
-            "date": datetime.now().strftime("%Y-%m-%d")
-        }
-        response = requests.get(uri, params=payload)
-        response.raise_for_status()  
-        data = response.json() 
-        
-        for entry in data:
+        while not stop_simulation.is_set():
+            payload = {"date": datetime.now().strftime("%Y-%m-%d")}
+            response = requests.get(uri, params=payload)
+            response.raise_for_status()  
+            data = response.json()[0] 
+            # print(f"DATA : {data}\n")
+ 
             message = { 
-                "temperature": round(float(entry.get("temperature", 0)), 2),
-                "heart_rate":  entry.get("heart_rate"),
-                "pression":  entry.get("pression") , 
+                "temperature": round(float(data.get("temperature", 0)), 1),
+                "heart_rate":  round(float(data.get("heart_rate", 0)), 1),
+                "pression":  round(float(data.get("pression", 0)), 1), 
             }
 
             anomalies = []
-            if message["temperature"] and message["temperature"] > 39.0:
+            if message["temperature"] and message["temperature"] > 39.5:
                 anomalies.append(f"Anomalie: Température élevée ({message['temperature']} °C)")
             if message["heart_rate"] and message["heart_rate"] > 120:
                 anomalies.append(f"Anomalie: Fréquence cardiaque élevée ({message['heart_rate']} bpm)")
-            if message["pression"] and message["pression"] < 90:
+            if message["pression"] and message["pression"] < 89:
                 anomalies.append(f"Anomalie: Pression basse ({message['pression']} %)")
 
             message["anomalies"] = anomalies
 
             client.publish(topic, json.dumps(message))
-            print(f"SIM Published!\n")
-            # print(f"SIM Published: {message}\n")
+            # print(f"SIM Published!")
+            print(f"SIM Published: {message}\n")
+            
+            dataToday = fetch_statistics(url, "stat/", id_user, date_today) 
+            dataYesterday = fetch_statistics(url, "stat/", id_user, date_yesterday) 
+            publish_statistics(dataYesterday, dataToday, topicStat)
+
             time.sleep(2) 
   
     except requests.exceptions.RequestException as e:
         print(f"SIM Erreur lors de la récupération des données : {e}")
  
 
-# Configuration du callback
-client.on_message = on_message
+def on_message(client, userdata, msg):
+    global id_user, stop_simulation, simulation_thread
+    try:
+        payload = msg.payload.decode("utf-8") 
+        new_id_user = int(payload)
+        if new_id_user > 0: 
+            id_user = new_id_user
 
-# Abonnement au topic pour les requêtes utilisateur
-client.subscribe(requestUserTopic)
-# print(f"Abonné au topic: {requestUserTopic}")
+            stop_simulation.set()
+            if simulation_thread and simulation_thread.is_alive():
+                simulation_thread.join()
+            stop_simulation.clear()
+            simulation_thread = threading.Thread(target=fetch_and_publish_simulation, args=(url, "vitals/", id_user))
+            simulation_thread.start()
 
-# Boucle principale MQTT
+            fetch_and_publish_user(url, "user/", id_user)  
+
+        else:
+            print(f"ID utilisateur invalide: {id_user}")
+    except ValueError:
+        print(f"Erreur de parsing de l'ID utilisateur: {msg.payload}")
+
+ 
+client.on_message = on_message 
+client.subscribe(requestUserTopic) 
 client.loop_start()
  
-while True:  
-    date_today = datetime.now().strftime("%Y-%m-%d")
-    date_yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-    dataToday = fetch_statistics(url, "stat/", id_user, date_today) 
-    dataYesterday = fetch_statistics(url, "stat/", id_user, date_yesterday) 
-    publish_statistics(dataYesterday, dataToday, topicStat)
-    # fetch_and_publish_simulation(url, "vitals/", id_user)
-    time.sleep(2) 
+# La première simulation
+simulation_thread = threading.Thread(target=fetch_and_publish_simulation, args=(url, "vitals/", id_user))
+simulation_thread.start()
+
+# Garder le script actif
+try:
+    while True:
+        time.sleep(2)
+except KeyboardInterrupt:
+    stop_simulation.set()
+    simulation_thread.join()
+    client.loop_stop()
+    client.disconnect()
+ 
     

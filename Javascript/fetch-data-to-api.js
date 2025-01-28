@@ -15,8 +15,8 @@ function getLatestValue() {
 function sendDataToServer(value) {
   const values = value.split(",").map((v) => v.trim());
   const c = values[0] ? parseFloat(values[0]) : null;
-  const bpm = values[1] ? parseInt(values[1]) : null;
-  const spo2 = values[2] ? parseInt(values[2]) : null;
+  const bpm = values[1] ? parseFloat(values[1]) : null;
+  const spo2 = values[2] ? parseFloat(values[2]) : null;
 
   if (c === null && bpm === null && spo2 === null) {
     return;

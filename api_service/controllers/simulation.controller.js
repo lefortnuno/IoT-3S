@@ -18,7 +18,7 @@ module.exports.add = async (req, res) => {
     temperature: data.c,
     heart_rate: data.bpm,
     pression: data.spo2,
-  };
+  }; 
 
   try {
     const result = await Simulation.add(newData);
@@ -88,7 +88,7 @@ module.exports.getStatValue = async (req, res) => {
 
 module.exports.getAll = async (req, res) => {
   const id = req.params.id;
-  const date = req.query.date; 
+  const date = req.query.date;
 
   if (!id || !date) {
     return res.status(400).send({ error: "Missing id or date" });

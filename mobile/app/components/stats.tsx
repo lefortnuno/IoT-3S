@@ -12,7 +12,7 @@ import {
 
 const screenWidth = Dimensions.get("window").width;
 
-// const BASE_URL_LOCAL = "http://192.168.1.10:5111/api/simulation/";
+// const BASE_URL = "http://192.168.1.10:5111/api/simulation/";
 const BASE_URL = "https://iot-3s.onrender.com/api/simulation/";
 
 interface Stat {

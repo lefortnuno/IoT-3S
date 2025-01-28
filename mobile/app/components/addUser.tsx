@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import axios from "axios";
 
-// const BASE_URL_LOCAL = "http://192.168.1.10:5111/api/simulation/";
+// const BASE_URL = "http://192.168.1.10:5111/api/simulation/";
 const BASE_URL = "https://iot-3s.onrender.com/api/simulation/";
 
 export default function AddUser() {

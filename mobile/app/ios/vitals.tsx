@@ -19,7 +19,7 @@ import { useLocalSearchParams } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
 
-// const BASE_URL_LOCAL = "http://192.168.1.10:5111/api/simulation/";
+// const BASE_URL = "http://192.168.1.10:5111/api/simulation/";
 const BASE_URL = "https://iot-3s.onrender.com/api/simulation/"
 
 interface User {
@@ -50,8 +50,8 @@ export default function Vitals() {
       };
 
   const [temperature, setTemperature] = useState(36.5);
-  const [heartRate, setHeartRate] = useState(65);
-  const [spo2, setSpo2] = useState(92);
+  const [heartRate, setHeartRate] = useState(65.3);
+  const [spo2, setSpo2] = useState(98.1);
   const [intensity, setIntensity] = useState(0);
   const [heartRateData, setHeartRateData] = useState<number[]>([]);
   const [temperatureData, setTemperatureData] = useState<number[]>([]);
@@ -122,10 +122,10 @@ export default function Vitals() {
         const variationT = (Math.random() * 0.2 - 0.1) * multiplier;
         newTemperature = Math.min(39, Math.max(35, temperature + variationT));
 
-        const variationH = (Math.random() * 4 - 2) * multiplier;
+        const variationH = (Math.random() * 4.1 - 2.1) * multiplier;
         newHeartRate = Math.min(120, Math.max(45, heartRate + variationH));
 
-        const variation = (Math.random() * 2 - 1) * multiplier;
+        const variation = (Math.random() * 2.1 - 1.1) * multiplier;
         newSpo2 = Math.min(100, Math.max(88, spo2 + variation));
       } else {
         newTemperature = Math.min(42, temperature + 0.17 * multiplier);
@@ -171,8 +171,8 @@ export default function Vitals() {
       const vitalsData = {
         u_id: parsedUser.u_id,
         c: temperature.toFixed(1),
-        bpm: Math.round(heartRate),
-        spo2: Math.round(spo2),
+        bpm: heartRate.toFixed(1),
+        spo2: spo2.toFixed(1),
       };
 
       axios
